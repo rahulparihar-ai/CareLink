@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   RotateCcw, FileSearch, Check, X, Pencil, FileText,
@@ -48,8 +48,15 @@ export function DoctorPatientView() {
   const [confirmRf, setConfirmRf] = useState<Record<string, boolean>>({});
   const [escalated, setEscalated] = useState<Record<string, boolean>>({});
   const [rejectOpen, setRejectOpen] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
 
   const addRxRow = () => setRx((r) => [...r, { name: "", dose: "", freq: "", dur: "" }]);
+
+  useEffect(() => {
+    if (!regenerating) return;
+    const id = setTimeout(() => setRegenerating(false), 1200);
+    return () => clearTimeout(id);
+  }, [regenerating]);
 
   const evidence = {
     chiefComplaint: [{ field: "Intake response #1", text: "Patient reported pain in the chest area with radiation to the left arm." }],
@@ -281,8 +288,10 @@ export function DoctorPatientView() {
           <StatusBadge variant={statusVariant(patient.status)} dot>{patient.status.replace("_", " ")}</StatusBadge>
         </div>
         <div className="mt-2.5 grid grid-cols-2 gap-2">
-          <Button variant="outline" className="flex items-center gap-1.5"><RotateCcw className="size-4" /> Regenerate AI</Button>
-          <Button className="flex items-center gap-1.5"><Check className="size-4" /> Start Consultation</Button>
+          <Button variant="outline" className="flex items-center gap-1.5" onClick={() => setRegenerating(true)} disabled={regenerating}>
+            <RotateCcw className={cn("size-4", regenerating && "animate-spin")} /> {regenerating ? "Regenerating…" : "Regenerate AI"}
+          </Button>
+          <Button className="flex items-center gap-1.5" onClick={() => { setVerdict("accepted"); setView("DOCTOR_NOTES"); }}><Check className="size-4" /> Start Consultation</Button>
         </div>
       </div>
 

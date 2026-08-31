@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  UserRound,
   ClipboardList,
   History,
   FileText,
@@ -13,24 +12,26 @@ import {
   Stethoscope,
   IdCard,
   ShieldCheck,
+  ShieldAlert,
   Users,
   Siren,
   Sparkles,
   Activity,
   Footprints,
   Moon,
-  Settings,
   HeartPulse,
   Upload,
   CalendarPlus,
   Droplets,
+  Syringe,
+  CreditCard,
+  Apple,
 } from "lucide-react";
 import { useAppStore } from "@/store";
 import { PatientHeader } from "@/components/shared/AppHeader";
 import { PatientBottomNav } from "@/components/shared/BottomNav";
 import { NavigationDrawer } from "@/components/shared/NavigationDrawer";
 import { SectionTitle, AIDisclaimer } from "@/components/shared/primitive";
-import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LiveVitalsCard } from "@/components/shared/LiveVitalsCard";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
@@ -46,24 +47,47 @@ export function PatientHome() {
 
   const upcoming = appointments.find((a) => a.status === "upcoming");
 
-  const services = [
-    { icon: UserRound, title: t("service.healthProfile"), desc: "Personal & contact details", tone: "primary" as const, view: "PATIENT_PROFILE" as const },
-    { icon: ClipboardList, title: t("service.medicalHistory"), desc: "Conditions, surgeries & more", tone: "sky" as const, view: "PATIENT_HISTORY" as const },
-    { icon: History, title: t("service.timeline"), desc: "Your health over time", tone: "gold" as const, view: "PATIENT_TIMELINE" as const },
-    { icon: FileText, title: t("service.documents"), desc: "Reports & records", tone: "primary" as const, view: "PATIENT_DOCUMENTS" as const },
-    { icon: Pill, title: t("service.prescriptions"), desc: "Medications list", tone: "green" as const, view: "PATIENT_MEDICATIONS" as const },
-    { icon: FlaskConical, title: t("service.labReports"), desc: "View results", tone: "pink" as const, view: "PATIENT_LAB" as const },
-    { icon: CalendarDays, title: t("service.appointments"), desc: "Book & manage", tone: "sky" as const, view: "PATIENT_APPOINTMENTS" as const },
-    { icon: Stethoscope, title: t("service.doctors"), desc: "Find specialists", tone: "primary" as const, view: "PATIENT_DOCTORS" as const },
-    { icon: IdCard, title: t("service.abha"), desc: "Health ID & consent", tone: "gold" as const, view: "PATIENT_ABHA" as const },
-    { icon: ShieldCheck, title: t("service.insurance"), desc: "Policies & coverage", tone: "green" as const, view: "PATIENT_INSURANCE" as const },
-    { icon: Users, title: t("service.family"), desc: "Family history", tone: "pink" as const, view: "PATIENT_FAMILY" as const },
-    { icon: Siren, title: t("service.emergency"), desc: "Critical info", tone: "danger" as const, view: "PATIENT_EMERGENCY" as const },
-    { icon: Sparkles, title: t("service.aiHealth"), desc: "Ask anything", tone: "gold" as const, view: "PATIENT_AI" as const },
-    { icon: Activity, title: t("service.checkin"), desc: "Quick health check", tone: "primary" as const, view: "PATIENT_INTAKE" as const },
-    { icon: Footprints, title: t("service.steps"), desc: "Track activity", tone: "green" as const, view: "PATIENT_STEPS" as const },
-    { icon: Moon, title: t("service.sleep"), desc: "Sleep insights", tone: "sky" as const, view: "PATIENT_SLEEP" as const },
-    { icon: Settings, title: t("service.settings"), desc: "Preferences", tone: "muted" as const, view: "PATIENT_SETTINGS" as const },
+  const categories: { title: string; items: { icon: typeof ClipboardList; title: string; tone: "primary" | "gold" | "green" | "pink" | "sky" | "danger" | "muted"; view: string }[] }[] = [
+    {
+      title: "My Health",
+      items: [
+        { icon: ClipboardList, title: "Medical History", tone: "primary", view: "PATIENT_HISTORY" },
+        { icon: History, title: "Timeline", tone: "gold", view: "PATIENT_TIMELINE" },
+        { icon: Pill, title: "Medications", tone: "green", view: "PATIENT_MEDICATIONS" },
+        { icon: ShieldAlert, title: "Allergies", tone: "danger", view: "PATIENT_ALLERGIES" },
+        { icon: Syringe, title: "Vaccinations", tone: "sky", view: "PATIENT_VACCINATION" },
+      ],
+    },
+    {
+      title: "Care",
+      items: [
+        { icon: CalendarDays, title: "Appointments", tone: "sky", view: "PATIENT_APPOINTMENTS" },
+        { icon: Stethoscope, title: "Doctors", tone: "primary", view: "PATIENT_DOCTORS" },
+        { icon: Pill, title: "Prescriptions", tone: "green", view: "PATIENT_MEDICATIONS" },
+        { icon: FlaskConical, title: "Lab Reports", tone: "pink", view: "PATIENT_LAB" },
+      ],
+    },
+    {
+      title: "My Records",
+      items: [
+        { icon: FileText, title: "Documents", tone: "primary", view: "PATIENT_DOCUMENTS" },
+        { icon: IdCard, title: "ABHA Health ID", tone: "gold", view: "PATIENT_ABHA" },
+        { icon: ShieldCheck, title: "Insurance", tone: "green", view: "PATIENT_INSURANCE" },
+        { icon: Users, title: "Family Health", tone: "pink", view: "PATIENT_FAMILY" },
+        { icon: CreditCard, title: "Health Card", tone: "sky", view: "PATIENT_HEALTHCARD" },
+        { icon: Siren, title: "Emergency Card", tone: "danger", view: "PATIENT_EMERGENCY" },
+      ],
+    },
+    {
+      title: "Wellness",
+      items: [
+        { icon: Sparkles, title: "AI Guidance", tone: "gold", view: "PATIENT_AI" },
+        { icon: Activity, title: "Quick Check", tone: "primary", view: "PATIENT_INTAKE" },
+        { icon: Footprints, title: "Steps", tone: "green", view: "PATIENT_STEPS" },
+        { icon: Moon, title: "Sleep", tone: "sky", view: "PATIENT_SLEEP" },
+        { icon: Apple, title: "Nutrition", tone: "pink", view: "PATIENT_NUTRITION" },
+      ],
+    },
   ];
 
   return (
@@ -97,20 +121,22 @@ export function PatientHome() {
                   <p className="text-xs text-white/80">{patientProfile?.id}</p>
                 </div>
               </div>
-              <StatusBadge variant="default" className="bg-white/15 text-white" dot>
-                {t("snapshot.bloodGroup")} {patientProfile?.bloodGroup ?? "B+"}
-              </StatusBadge>
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-wide text-white/70">Last visit</p>
+                <p className="text-sm font-semibold">{appointments[1]?.date ?? "Jul 2026"}</p>
+              </div>
             </div>
-            <div className="grid grid-cols-4 divide-x divide-white/15 text-center">
+            <div className="grid grid-cols-2 divide-x divide-y divide-white/15">
               {[
-                { label: t("snapshot.age"), value: String(patientProfile?.age ?? 34) },
-                { label: t("snapshot.conditions"), value: "2" },
-                { label: t("snapshot.medication"), value: "1" },
-                { label: t("snapshot.lastVisit"), value: "Aug" },
+                { label: "Blood Group", value: patientProfile?.bloodGroup ?? "B+", status: "✓" },
+                { label: "Allergies", value: patientProfile?.allergies ?? "None", status: "Known" },
+                { label: "Conditions", value: patientProfile?.knownConditions ?? "None", status: "2 active" },
+                { label: "Medications", value: patientProfile?.currentMedicines ?? "None", status: "Current" },
               ].map((s) => (
-                <div key={s.label} className="px-1 py-3">
-                  <p className="text-base font-bold">{s.value}</p>
-                  <p className="mt-0.5 text-[10px] text-white/75">{s.label}</p>
+                <div key={s.label} className="px-3 py-2.5">
+                  <p className="text-[10px] uppercase tracking-wide text-white/70">{s.label}</p>
+                  <p className="mt-0.5 truncate text-sm font-bold" title={s.value}>{s.value}</p>
+                  <p className="text-[10px] text-emerald-300">{s.status}</p>
                 </div>
               ))}
             </div>
@@ -153,41 +179,30 @@ export function PatientHome() {
           </div>
         </section>
 
-        {/* My Health */}
-        <section className="mt-6">
-          <SectionTitle title={t("home.myHealth")} action={t("common.viewAll")} onAction={() => setView("PATIENT_HISTORY")} />
-          <div className="grid grid-cols-3 gap-2.5">
-            <MiniTile icon={ClipboardList} label={t("service.medicalHistory")} onClick={() => setView("PATIENT_HISTORY")} />
-            <MiniTile icon={History} label={t("service.timeline")} onClick={() => setView("PATIENT_TIMELINE")} />
-            <MiniTile icon={Pill} label={t("service.prescriptions")} onClick={() => setView("PATIENT_MEDICATIONS")} />
-          </div>
-        </section>
-
-        {/* Services Grid */}
-        <section className="mt-6">
-          <SectionTitle title={t("home.services")} />
-          <div className="grid grid-cols-2 gap-3">
-            {services.map((s, i) => (
-              <motion.button
-                key={s.title}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03, duration: 0.3 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setView(s.view)}
-                className="elevate flex items-start gap-3 rounded-2xl border border-border bg-card p-3.5 text-left card-soft"
-              >
-                <span className={`mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl ${toneBg(s.tone)}`}>
-                  <s.icon className="size-5" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-[13px] font-semibold leading-tight">{s.title}</span>
-                  {s.desc && <span className="mt-0.5 block text-[11px] text-muted-foreground">{s.desc}</span>}
-                </span>
-              </motion.button>
-            ))}
-          </div>
-        </section>
+        {/* Services by category */}
+        {categories.map((cat, ci) => (
+          <section className="mt-6" key={cat.title}>
+            <SectionTitle title={cat.title} className={ci > 0 ? "mt-6" : ""} />
+            <div className="grid grid-cols-3 gap-2.5">
+              {cat.items.map((s, i) => (
+                <motion.button
+                  key={s.title}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03, duration: 0.3 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setView(s.view as never)}
+                  className="elevate flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center card-soft"
+                >
+                  <span className={`flex size-10 items-center justify-center rounded-xl ${toneBg(s.tone)}`}>
+                    <s.icon className="size-5" />
+                  </span>
+                  <span className="text-[11px] font-semibold leading-tight">{s.title}</span>
+                </motion.button>
+              ))}
+            </div>
+          </section>
+        ))}
 
         {/* Recent Activity */}
         <section className="mt-6">
@@ -292,19 +307,6 @@ function QuickAction({
         <Icon className="size-5" />
       </span>
       <span className="text-[13px] font-semibold leading-tight">{label}</span>
-    </motion.button>
-  );
-}
-
-function MiniTile({ icon: Icon, label, onClick }: { icon: React.ComponentType<{ className?: string }>; label: string; onClick: () => void }) {
-  return (
-    <motion.button
-      whileTap={{ scale: 0.97 }}
-      onClick={onClick}
-      className="elevate flex flex-col items-center gap-1.5 rounded-2xl border border-border bg-card p-3 text-center card-soft"
-    >
-      <Icon className="size-5 text-primary" />
-      <span className="text-[11px] font-medium leading-tight">{label}</span>
     </motion.button>
   );
 }
