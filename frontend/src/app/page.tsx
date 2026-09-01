@@ -40,12 +40,8 @@ import { PatientFamilyView } from "@/features/patient/PatientFamilyView";
 import { PatientAbhaView } from "@/features/patient/PatientAbhaView";
 import { PatientInsuranceView } from "@/features/patient/PatientInsuranceView";
 import { PatientVaccinationView } from "@/features/patient/PatientVaccinationView";
-import { PatientEmergencyCardView } from "@/features/patient/PatientEmergencyCardView";
-import { PatientHealthCardView } from "@/features/patient/PatientHealthCardView";
 import { PatientAppointmentsView } from "@/features/patient/PatientAppointmentsView";
 import { PatientBookAppointmentView } from "@/features/patient/PatientBookAppointmentView";
-import { PatientDoctorsView } from "@/features/patient/PatientDoctorsView";
-import { PatientDoctorProfileView } from "@/features/patient/PatientDoctorProfileView";
 import { PatientAiView } from "@/features/patient/PatientAiView";
 import { PatientIntakeView } from "@/features/patient/PatientIntakeView";
 import { PatientWellnessView } from "@/features/patient/PatientWellnessView";
@@ -242,23 +238,11 @@ export default function MobileApp() {
     case "PATIENT_VACCINATION":
       content = <PatientVaccinationView />;
       break;
-    case "PATIENT_EMERGENCY":
-      content = <PatientEmergencyCardView />;
-      break;
-    case "PATIENT_HEALTHCARD":
-      content = <PatientHealthCardView />;
-      break;
     case "PATIENT_APPOINTMENTS":
       content = <PatientAppointmentsView />;
       break;
     case "PATIENT_BOOK_APPOINTMENT":
       content = <PatientBookAppointmentView />;
-      break;
-    case "PATIENT_DOCTORS":
-      content = <PatientDoctorsView />;
-      break;
-    case "PATIENT_DOCTOR_PROFILE":
-      content = <PatientDoctorProfileView />;
       break;
     case "PATIENT_AI":
       content = <PatientAiView />;
