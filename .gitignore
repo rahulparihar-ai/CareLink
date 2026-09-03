@@ -51,3 +51,24 @@ __pycache__/
 
 # database backups (runtime artifacts)
 /database/backups/*
+
+# python / backend
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+htmlcov/
+.tox/
+
+# backend local sqlite + storage (never commit patient data)
+*.db
+*.sqlite3
+/backend/*.db
+/backend/storage/
+/storage/
+/backend/alembic_snap.db
+/backend/alembic_up.db
+
+# ai service
+.ai/.venv/
+ai/.venv/

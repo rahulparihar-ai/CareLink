@@ -26,8 +26,8 @@ import type {
   LabReport,
   StepsData,
   SleepData,
-  KioskSession,
-  KioskPhase,
+  IntakeSession,
+  IntakePhase,
   InputMode,
   HistoryMode,
   ConsentRecord,
@@ -92,14 +92,14 @@ export type View =
   | "LAB_REPORTS"
   | "SCAN_PRESCRIPTION"
 
-  // Care Link kiosk views
-  | "KIOSK_HOME"
-  | "KIOSK_IDENTIFY"
-  | "KIOSK_CONSENT"
-  | "KIOSK_HISTORY"
-  | "KIOSK_DOCUMENTS"
-  | "KIOSK_SUMMARY"
-  | "KIOSK_COMPLETE"
+  // Care Link intake views
+  | "INTAKE_HOME"
+  | "INTAKE_IDENTIFY"
+  | "INTAKE_CONSENT"
+  | "INTAKE_HISTORY"
+  | "INTAKE_DOCUMENTS"
+  | "INTAKE_SUMMARY"
+  | "INTAKE_COMPLETE"
   | "DOCTOR_CLINICAL";
 
 interface AppState {
@@ -206,23 +206,23 @@ interface AppState {
   addAuditEvent: (e: AuditEvent) => void;
   resetApp: () => void;
 
-  // Care Link kiosk
-  kioskSession: KioskSession | null;
-  startKioskSession: (partial: Partial<KioskSession>) => void;
-  setKioskPhase: (phase: KioskPhase) => void;
-  setKioskInputMode: (mode: InputMode) => void;
-  setKioskHistoryMode: (mode: HistoryMode) => void;
-  setKioskPatientId: (id: string) => void;
+  // Care Link intake
+  intakeSession: IntakeSession | null;
+  startIntakeSession: (partial: Partial<IntakeSession>) => void;
+  setIntakePhase: (phase: IntakePhase) => void;
+  setIntakeInputMode: (mode: InputMode) => void;
+  setIntakeHistoryMode: (mode: HistoryMode) => void;
+  setIntakePatientId: (id: string) => void;
   addConsentRecord: (r: ConsentRecord) => void;
   addConversationTurn: (t: ConversationTurn) => void;
   setClinicalHistory: (h: ClinicalHistory) => void;
-  addKioskDocument: (d: DocumentIntelligence) => void;
+  addIntakeDocument: (d: DocumentIntelligence) => void;
   addRedFlagAlert: (r: RedFlagAlert) => void;
   setPhysicianSummary: (s: PhysicianSummary) => void;
-  completeKioskSession: () => void;
-  resetKioskSession: () => void;
+  completeIntakeSession: () => void;
+  resetIntakeSession: () => void;
 
-  // real patient cases captured through the kiosk/case-taking flow
+  // real patient cases captured through the intake/case-taking flow
   caseQueue: DoctorPatientRecord[];
   addCompletedCase: (c: DoctorPatientRecord) => void;
   updateCaseStatus: (id: string, status: DoctorPatientRecord["status"]) => void;
@@ -374,12 +374,12 @@ export const useAppStore = create<AppState>()(
           selectedPatientId: null,
         }),
 
-      // Care Link kiosk
-      kioskSession: null,
-      startKioskSession: (partial) =>
+      // Care Link intake
+      intakeSession: null,
+      startIntakeSession: (partial) =>
         set((s) => {
-          const base: KioskSession = {
-            id: uid("kiosk"),
+          const base: IntakeSession = {
+            id: uid("intake"),
             patientId: undefined,
             phase: "welcome",
             inputMode: "voice",
@@ -393,50 +393,50 @@ export const useAppStore = create<AppState>()(
             summary: null,
             startedAt: now(),
           };
-          return { kioskSession: { ...base, ...partial } };
+          return { intakeSession: { ...base, ...partial } };
         }),
-      setKioskPhase: (phase) =>
-        set((s) => ({ kioskSession: s.kioskSession ? { ...s.kioskSession, phase } : s.kioskSession })),
-      setKioskInputMode: (inputMode) =>
-        set((s) => ({ kioskSession: s.kioskSession ? { ...s.kioskSession, inputMode } : s.kioskSession })),
-      setKioskHistoryMode: (historyMode) =>
-        set((s) => ({ kioskSession: s.kioskSession ? { ...s.kioskSession, historyMode } : s.kioskSession })),
-      setKioskPatientId: (patientId) =>
-        set((s) => ({ kioskSession: s.kioskSession ? { ...s.kioskSession, patientId } : s.kioskSession })),
+      setIntakePhase: (phase) =>
+        set((s) => ({ intakeSession: s.intakeSession ? { ...s.intakeSession, phase } : s.intakeSession })),
+      setIntakeInputMode: (inputMode) =>
+        set((s) => ({ intakeSession: s.intakeSession ? { ...s.intakeSession, inputMode } : s.intakeSession })),
+      setIntakeHistoryMode: (historyMode) =>
+        set((s) => ({ intakeSession: s.intakeSession ? { ...s.intakeSession, historyMode } : s.intakeSession })),
+      setIntakePatientId: (patientId) =>
+        set((s) => ({ intakeSession: s.intakeSession ? { ...s.intakeSession, patientId } : s.intakeSession })),
       addConsentRecord: (r) =>
         set((s) => ({
-          kioskSession: s.kioskSession
+          intakeSession: s.intakeSession
             ? {
-                ...s.kioskSession,
-                consentRecords: [...s.kioskSession.consentRecords, r],
+                ...s.intakeSession,
+                consentRecords: [...s.intakeSession.consentRecords, r],
               }
-            : s.kioskSession,
+            : s.intakeSession,
         })),
       addConversationTurn: (t) =>
         set((s) => ({
-          kioskSession: s.kioskSession
-            ? { ...s.kioskSession, conversationTurns: [...s.kioskSession.conversationTurns, t] }
-            : s.kioskSession,
+          intakeSession: s.intakeSession
+            ? { ...s.intakeSession, conversationTurns: [...s.intakeSession.conversationTurns, t] }
+            : s.intakeSession,
         })),
       setClinicalHistory: (clinicalHistory) =>
-        set((s) => ({ kioskSession: s.kioskSession ? { ...s.kioskSession, clinicalHistory } : s.kioskSession })),
-      addKioskDocument: (d) =>
+        set((s) => ({ intakeSession: s.intakeSession ? { ...s.intakeSession, clinicalHistory } : s.intakeSession })),
+      addIntakeDocument: (d) =>
         set((s) => ({
-          kioskSession: s.kioskSession
-            ? { ...s.kioskSession, documents: [...s.kioskSession.documents, d] }
-            : s.kioskSession,
+          intakeSession: s.intakeSession
+            ? { ...s.intakeSession, documents: [...s.intakeSession.documents, d] }
+            : s.intakeSession,
         })),
       addRedFlagAlert: (r) =>
         set((s) => ({
-          kioskSession: s.kioskSession ? { ...s.kioskSession, redFlags: [...s.kioskSession.redFlags, r] } : s.kioskSession,
+          intakeSession: s.intakeSession ? { ...s.intakeSession, redFlags: [...s.intakeSession.redFlags, r] } : s.intakeSession,
         })),
       setPhysicianSummary: (summary) =>
-        set((s) => ({ kioskSession: s.kioskSession ? { ...s.kioskSession, summary } : s.kioskSession })),
-      completeKioskSession: () =>
+        set((s) => ({ intakeSession: s.intakeSession ? { ...s.intakeSession, summary } : s.intakeSession })),
+      completeIntakeSession: () =>
         set((s) => ({
-          kioskSession: s.kioskSession ? { ...s.kioskSession, phase: "complete", completedAt: now() } : s.kioskSession,
+          intakeSession: s.intakeSession ? { ...s.intakeSession, phase: "complete", completedAt: now() } : s.intakeSession,
         })),
-      resetKioskSession: () => set({ kioskSession: null }),
+      resetIntakeSession: () => set({ intakeSession: null }),
       caseQueue: [],
       addCompletedCase: (c) => set((s) => ({ caseQueue: [c, ...s.caseQueue] })),
       updateCaseStatus: (id, status) =>
@@ -449,7 +449,7 @@ export const useAppStore = create<AppState>()(
         set((s) => ({
           caseQueue: s.caseQueue.map((c) => (c.id === id ? { ...c, ...patch } : c)),
         })),
-      // Real patient cases captured through the kiosk/case-taking flow. The
+      // Real patient cases captured through the intake/case-taking flow. The
       // The doctor queue is never pre-seeded in production or in demo.
       // No fabricated patient records are ever injected; the portal starts
       // empty and waits for real patient intake.
@@ -489,7 +489,7 @@ export const useAppStore = create<AppState>()(
         pinEnabled: s.pinEnabled,
         pin: s.pin,
         isUnlocked: s.isUnlocked,
-        kioskSession: s.kioskSession,
+        intakeSession: s.intakeSession,
         caseQueue: s.caseQueue,
         caseQueueDemo: s.caseQueueDemo,
         auditTrail: s.auditTrail,

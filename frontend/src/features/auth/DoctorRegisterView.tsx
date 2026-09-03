@@ -198,10 +198,9 @@ export function DoctorRegisterView() {
       specialization: creds.specialization,
       facility: workplace,
       mobileNumber: mobile || (loginMobile || undefined),
-      email: account.email || (basic.email || undefined),
       gender: basic.gender || undefined,
       professionalId: creds.registrationNumber || undefined,
-      loginId: account.email || mobile,
+      loginId: mobile,
       doctorId,
       password: account.password || undefined,
       languages: langs,
@@ -587,15 +586,6 @@ export function DoctorRegisterView() {
                 <h1 className="text-2xl font-bold">{t("dreg.account.title")}</h1>
                 <p className="mt-1 text-sm text-muted-foreground">{t("dreg.account.subtitle")}</p>
                 <div className="mt-5 space-y-4">
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium">{t("dreg.account.email")}</label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground" />
-                      <input type="email" value={account.email} onChange={(e) => setAcc("email", e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full rounded-xl border border-input bg-card py-3.5 pl-12 pr-4 text-base outline-none focus:border-ring focus:ring-2 focus:ring-ring/30" />
-                    </div>
-                  </div>
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">{t("dreg.account.password")}</label>
                     <div className="relative">

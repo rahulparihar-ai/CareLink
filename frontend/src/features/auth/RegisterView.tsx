@@ -42,8 +42,6 @@ export function RegisterView() {
     name: "",
     age: "",
     gender: "Male",
-    dob: "",
-    email: "",
     address: "",
     bloodGroup: "",
     emergencyName: "",
@@ -84,9 +82,7 @@ export function RegisterView() {
     if (step === "identity") {
       const missing: string[] = [];
       if (!form.name.trim()) missing.push("name");
-      if (!form.dob.trim()) missing.push("dob");
       if (!form.gender.trim()) missing.push("gender");
-      if (!form.email.trim()) missing.push("email");
       if (!form.address.trim()) missing.push("address");
       if (missing.length > 0) {
         setConsentError(t("onb.completeRequired"));
@@ -118,17 +114,14 @@ export function RegisterView() {
   const finalizeProfile = () => {
     const name = form.name.trim();
     const patientId = generatePatientId();
-    const dob = form.dob.trim();
-    const ageFromDob = dob
-      ? Math.max(0, Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000)))
-      : Number(form.age) || 0;
+    const ageFromForm = Number(form.age) || 0;
     setPatientProfile({
       id: patientId,
       name,
-      age: ageFromDob,
+      age: ageFromForm,
       gender: form.gender,
-      dateOfBirth: dob || undefined,
-      email: form.email.trim() || undefined,
+      dateOfBirth: undefined,
+      email: undefined,
       address: form.address.trim() || undefined,
       mobileNumber: form.mobile.trim() || loginMobile,
       password: account.password || undefined,
@@ -295,19 +288,6 @@ export function RegisterView() {
                     </div>
                   )}
 
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium">
-                      {isProxy ? t("onb.proxy.dob") : t("onb.dob")} <span className="text-destructive">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={form.dob}
-                      onChange={(e) => set("dob", e.target.value)}
-                      max={new Date().toISOString().slice(0, 10)}
-                      className={inputCls}
-                    />
-                  </div>
-
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
@@ -335,20 +315,6 @@ export function RegisterView() {
                         <option>Other</option>
                       </select>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium">
-                      {t("onb.email")} <span className="text-destructive">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => set("email", e.target.value)}
-                      placeholder="name@example.com"
-                      autoComplete="email"
-                      className={inputCls}
-                    />
                   </div>
 
                   <div>

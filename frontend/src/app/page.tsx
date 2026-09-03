@@ -64,15 +64,15 @@ import { DoctorConsultationView } from "@/features/doctor/DoctorConsultationView
 import { PinLockScreen } from "@/components/shared/PinLockScreen";
 import { AudioGuidedAnnouncer } from "@/components/shared/AudioGuidedAnnouncer";
 
-// Care Link kiosk
-import { KioskHome } from "@/features/kiosk/KioskHome";
-import { KioskIdentify } from "@/features/kiosk/KioskIdentify";
-import { KioskConsent } from "@/features/kiosk/KioskConsent";
-import { KioskHistory } from "@/features/kiosk/KioskHistory";
-import { KioskDocuments } from "@/features/kiosk/KioskDocuments";
-import { KioskSummary } from "@/features/kiosk/KioskSummary";
-import { KioskComplete } from "@/features/kiosk/KioskComplete";
-import { DoctorClinicalView } from "@/features/kiosk/DoctorClinicalView";
+// Care Link intake
+import { IntakeHome } from "@/features/intake/IntakeHome";
+import { IntakeIdentify } from "@/features/intake/IntakeIdentify";
+import { IntakeConsent } from "@/features/intake/IntakeConsent";
+import { IntakeHistory } from "@/features/intake/IntakeHistory";
+import { IntakeDocuments } from "@/features/intake/IntakeDocuments";
+import { IntakeSummary } from "@/features/intake/IntakeSummary";
+import { IntakeComplete } from "@/features/intake/IntakeComplete";
+import { DoctorClinicalView } from "@/features/intake/DoctorClinicalView";
 
 export default function MobileApp() {
   const currentView = useAppStore((s) => s.currentView);
@@ -154,27 +154,27 @@ export default function MobileApp() {
       content = <AiAssistantView />;
       break;
 
-    // Care Link kiosk
-    case "KIOSK_HOME":
-      content = <KioskHome />;
+    // Care Link intake
+    case "INTAKE_HOME":
+      content = <IntakeHome />;
       break;
-    case "KIOSK_IDENTIFY":
-      content = <KioskIdentify />;
+    case "INTAKE_IDENTIFY":
+      content = <IntakeIdentify />;
       break;
-    case "KIOSK_CONSENT":
-      content = <KioskConsent />;
+    case "INTAKE_CONSENT":
+      content = <IntakeConsent />;
       break;
-    case "KIOSK_HISTORY":
-      content = <KioskHistory />;
+    case "INTAKE_HISTORY":
+      content = <IntakeHistory />;
       break;
-    case "KIOSK_DOCUMENTS":
-      content = <KioskDocuments />;
+    case "INTAKE_DOCUMENTS":
+      content = <IntakeDocuments />;
       break;
-    case "KIOSK_SUMMARY":
-      content = <KioskSummary />;
+    case "INTAKE_SUMMARY":
+      content = <IntakeSummary />;
       break;
-    case "KIOSK_COMPLETE":
-      content = <KioskComplete />;
+    case "INTAKE_COMPLETE":
+      content = <IntakeComplete />;
       break;
     case "DOCTOR_CLINICAL":
       content = <DoctorClinicalView />;

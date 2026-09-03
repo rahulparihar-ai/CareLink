@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Globe, Accessibility, HelpCircle, Palette, ArrowRight, User, Stethoscope } from "lucide-react";
+import { Globe, Accessibility, HelpCircle, ArrowRight, User, Stethoscope } from "lucide-react";
 import { useAppStore } from "@/store";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -82,7 +82,6 @@ export function WelcomeView() {
         {[
           { icon: Globe, label: t("auth.language"), view: "LANGUAGE" as const },
           { icon: Accessibility, label: t("auth.accessibility"), view: "ACCESSIBILITY" as const },
-          { icon: Palette, label: t("a11y.theme"), view: "THEME" as const },
           { icon: HelpCircle, label: t("auth.help"), view: "HELP" as const },
         ].map(({ icon: Icon, label, view }) => (
           <button

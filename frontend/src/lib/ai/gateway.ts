@@ -19,6 +19,7 @@ import { getAiConfig } from "./config";
 import { buildSystemPrompt, buildOutputFormatInstruction } from "./prompts";
 import { OpenAICompatibleProvider } from "./providers/openai";
 import { isAllowedAction } from "./actions";
+import { mockHealthReply } from "./mockHealth";
 import type {
   AiAssistantAction,
   AiChatMessage,
@@ -220,7 +221,20 @@ function deterministicMock(message: string, language: LanguageCode): AiChatRespo
   if (/(login|sign in|लॉगिन)/.test(q)) {
     return { success: true, message: mockText(language, "login"), language, action: "OPEN_LOGIN", actionParams: {} };
   }
+
+  // Health-related questions get safe, general offline guidance in the
+  // user's selected language (no diagnosis, no fabricated data).
+  if (isHealthQuestion(q)) {
+    const reply = mockHealthReply(message, language);
+    return { success: true, message: reply.message, language, action: reply.action, actionParams: {} };
+  }
+
   return { success: true, message: mockText(language, "fallback"), language, action: null, actionParams: {} };
+}
+
+/** Heuristic: does this look like a health/medical question worth offline guidance? */
+function isHealthQuestion(q: string): boolean {
+  return /fever|bukh|headache|cough|cold|stomach|bp\b|blood pressure|sugar|diabetes|diet|nutrition|food|vitamin|sleep|exercise|stress|anxiety|depression|child|baby|pregnancy|vaccin|pain|ache|bimari|bermar|बीमार|बुखार|सिरदर्द|खांसी|शुगर|दर्द|उच्च रक्तचाप/.test(q);
 }
 
 /** Minimal translated strings for the mock path. Missing languages fall back to English. */

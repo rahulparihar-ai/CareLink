@@ -18,7 +18,7 @@ interface Message {
 // assistant answers purely from this script — it does not read any health
 // data because the user has not signed in yet. All copy is translated via
 // the i18n system so the Help Desk always follows the selected language.
-const TOPICS = ["register", "doctor", "kiosk", "timeline", "documents", "language", "theme", "ai"] as const;
+const TOPICS = ["register", "doctor", "intake", "timeline", "documents", "language", "theme", "ai"] as const;
 
 // English keyword set used to classify a free-typed question. Suggestion
 // buttons pass their topic directly. Answers are pulled from the current
@@ -26,7 +26,7 @@ const TOPICS = ["register", "doctor", "kiosk", "timeline", "documents", "languag
 const KEYWORDS: Record<(typeof TOPICS)[number], string[]> = {
   register: ["register", "sign up", "signup", "patient", "hoshiyar", "abha", "account"],
   doctor: ["doctor", "login", "id", "password", "hospital"],
-  kiosk: ["kiosk", "terminal", "machine", "self", "case-taking"],
+  intake: ["intake", "terminal", "machine", "self", "case-taking"],
   timeline: ["timeline", "history", "record"],
   documents: ["document", "scan", "ocr", "upload", "prescription", "report"],
   language: ["language", "translate", "hindi", "urdu", "english"],
@@ -43,7 +43,7 @@ function topicForQuery(query: string): (typeof TOPICS)[number] {
 }
 
 // Suggestion topic order matches the help.suggest.N keys 1..5.
-const SUGGESTION_TOPICS: (typeof TOPICS)[number][] = ["ai", "register", "doctor", "kiosk", "documents"];
+const SUGGESTION_TOPICS: (typeof TOPICS)[number][] = ["ai", "register", "doctor", "intake", "documents"];
 
 export function HelpAssistantView() {
   const setView = useAppStore((s) => s.setView);

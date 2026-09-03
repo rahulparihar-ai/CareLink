@@ -30,10 +30,29 @@ export function langToBcp47(language: LanguageCode): string {
 /** Attempt to find a speechSynthesis voice matching a language tag. */
 export function findVoice(language: LanguageCode): SpeechSynthesisVoice | null {
   const bcp47 = langToBcp47(language).toLowerCase();
-  const voices = typeof speechSynthesis !== "undefined" ? speechSynthesis.getVoices() : [];
+  const voices =
+    typeof speechSynthesis !== "undefined" ? speechSynthesis.getVoices() : [];
   if (!voices.length) return null;
-  const exact = voices.find((v) => v.lang.toLowerCase() === bcp47);
-  if (exact) return exact;
-  const langBase = bcp47.split("-")[0];
-  return voices.find((v) => v.lang.toLowerCase().startsWith(langBase)) ?? null;
+
+  // 1) Exact India-locale voice first (e.g. hi-IN, en-IN, bn-IN). These are
+  //    the genuinely Indian-sounding voices preferred across all 13 locales.
+  const exactIndia = voices.find((v) => v.lang.toLowerCase() === bcp47);
+  if (exactIndia) return exactIndia;
+
+  // 2) A voice for the same script/language with an -IN suffix on its lang tag.
+  const base = bcp47.split("-")[0];
+  const anyIndia = voices.find((v) => {
+    const tag = v.lang.toLowerCase();
+    return tag.startsWith(base) && tag.endsWith("in");
+  });
+  if (anyIndia) return anyIndia;
+
+  // 3) Any Indian voice with the same language base.
+  const baseIndia = voices.find(
+    (v) => v.lang.toLowerCase().startsWith(base) && v.lang.toLowerCase().includes("-in")
+  );
+  if (baseIndia) return baseIndia;
+
+  // 4) Fall back to any voice for the language base.
+  return voices.find((v) => v.lang.toLowerCase().startsWith(base)) ?? null;
 }

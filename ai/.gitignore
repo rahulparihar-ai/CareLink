@@ -1,0 +1,17 @@
+# Secrets / local env - never commit
+.env
+.env.local
+*.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+dist/
+build/
+
+# Local runtime artifacts (not committed)
+*.log

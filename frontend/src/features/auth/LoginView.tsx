@@ -57,14 +57,14 @@ export function LoginView() {
     setAadhaarLinked(true);
     setAadhaarVerified(true);
     setAadhaarReference(maskAadhaar(aadhaar));
+    // Always send the user to the details/registration form after Aadhaar
+    // verification - same as the mobile verification flow. Details are
+    // collected regardless of the verification method.
     if (patientProfile) {
       setPatientProfile({ ...patientProfile, aadhaarVerified: true, abhaStatus: "Linked", abhaReference: maskAadhaar(aadhaar) });
-      setRole("PATIENT");
-      setView("PATIENT_HOME");
-    } else {
-      setRole("PATIENT");
-      setView("REGISTER");
     }
+    setRole("PATIENT");
+    setView("REGISTER");
   };
 
   const handleAadhaarOtpChange = (val: string, i: number) => {

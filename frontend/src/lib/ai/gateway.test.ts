@@ -35,6 +35,23 @@ describe("AiGateway (mock mode)", () => {
     expect(res.action).toBeNull();
   });
 
+  it("answers a health question with safe offline guidance and a disclaimer", async () => {
+    const res = await mockGateway().chat({ message: "What should I do for fever?", language: "en" });
+    expect(res.success).toBe(true);
+    expect(res.action).toBeNull();
+    expect(res.message.length).toBeGreaterThan(20);
+    expect(/doctor|consult/i.test(res.message)).toBe(true);
+  });
+
+  it("answers health questions in the selected language", async () => {
+    const en = await mockGateway().chat({ message: "I have a headache", language: "en" });
+    const hi = await mockGateway().chat({ message: "मुझे बुखार है", language: "hi" });
+    expect(en.success).toBe(true);
+    expect(hi.success).toBe(true);
+    expect(hi.language).toBe("hi");
+    expect(hi.message.length).toBeGreaterThan(20);
+  });
+
   it("respects the selected language defaulting to English", async () => {
     const en = await mockGateway().chat({ message: "hi", language: "en" });
     const hi = await mockGateway().chat({ message: "hi", language: "hi" });

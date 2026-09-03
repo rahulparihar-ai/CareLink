@@ -1,1 +1,45 @@
-"""AI I/O contracts."""
+"""CareLink AI - schemas package."""
+
+from .base import (
+    AiTask,
+    ApiError,
+    ApiResponse,
+    AuditEvent,
+    ClinicalFact,
+    DocumentKind,
+    ErrorResponse,
+    FactSourceType,
+    FactStatus,
+    InterviewContext,
+    LanguageMetadata,
+    Metadata,
+    Priority,
+    RedFlagSeverity,
+    SourceRef,
+    TaskKind,
+    ValidationFinding,
+    ValidationSeverity,
+    VerificationStatus,
+)
+
+__all__ = [
+    "AiTask",
+    "ApiError",
+    "ApiResponse",
+    "AuditEvent",
+    "ClinicalFact",
+    "DocumentKind",
+    "ErrorResponse",
+    "FactSourceType",
+    "FactStatus",
+    "InterviewContext",
+    "LanguageMetadata",
+    "Metadata",
+    "Priority",
+    "RedFlagSeverity",
+    "SourceRef",
+    "TaskKind",
+    "ValidationFinding",
+    "ValidationSeverity",
+    "VerificationStatus",
+]

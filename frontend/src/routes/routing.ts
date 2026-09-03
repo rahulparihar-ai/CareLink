@@ -63,16 +63,16 @@ const DOCTOR_VIEWS = new Set<View>([
   "DOCTOR_CLINICAL",
 ]);
 
-// Care Link kiosk self-service case-taking terminal + hospital hub.
+// Care Link intake self-service case-taking terminal + hospital hub.
 // Accessible to any authenticated role (both doctor and patient staff flows).
 const PUBLICTERMINAL_VIEWS = new Set<View>([
-  "KIOSK_HOME",
-  "KIOSK_IDENTIFY",
-  "KIOSK_CONSENT",
-  "KIOSK_HISTORY",
-  "KIOSK_DOCUMENTS",
-  "KIOSK_SUMMARY",
-  "KIOSK_COMPLETE",
+  "INTAKE_HOME",
+  "INTAKE_IDENTIFY",
+  "INTAKE_CONSENT",
+  "INTAKE_HISTORY",
+  "INTAKE_DOCUMENTS",
+  "INTAKE_SUMMARY",
+  "INTAKE_COMPLETE",
   "HOSPITAL_HOME",
   "REGISTER_PATIENT",
   "LAB_REPORTS",

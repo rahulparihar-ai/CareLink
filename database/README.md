@@ -1,21 +1,38 @@
 # CareLink Database
 
-Database schema, migrations, seed data and backups.
+Persistence for CareLink is defined by the backend ORM and managed with Alembic.
 
-> **Status:** Scaffold. Currently the app runs on browser-local mock state (Zustand). This directory defines the target persistence layer the backend will use.
+> **Status:** Implemented. Models live in `backend/app/models/models.py` (~30
+> entities). Migrations live in `backend/alembic/`. Dev uses SQLite; production
+> uses PostgreSQL.
+
+## Apply migrations
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+Generate a new migration after model changes:
+
+```bash
+cd backend
+alembic revision --autogenerate -m "describe change"
+```
 
 ## Structure
 
 ```
-database/
-├── migrations/   # versioned schema migrations (e.g. Alembic)
-├── schemas/      # canonical SQL / DDL definitions
-├── seed/         # seed scripts (environments, professions — NOT patient demos)
-├── backups/      # dump/restore artifacts
-└── README.md
+database/          # this directory (conventions & backups)
+backend/app/models/   # canonical ORM models
+backend/alembic/      # versioned migrations
+backend/alembic/versions/0001_initial.py   # initial full schema
 ```
 
 ## Principles
 
-- Registration data must save verbatim to the same patient profile (single source of truth).
-- No fabricated patient or personal medical data is seeded into the database. Seed scripts may populate only reference data (languages, states, professions, councils).
+- Registration data saves verbatim to the same patient profile (single source of truth).
+- **No fabricated patient or personal medical data is seeded.** Seed scripts populate only reference data (languages, states, professions, councils).
+- **Seed data is separate from migrations** so no demo/fabricated data is ever committed as a migration.
+- **QR codes and flash sessions carry only secure tokens** — never medical data.
+- The AI service never owns the primary patient database.

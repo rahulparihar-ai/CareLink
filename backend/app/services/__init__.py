@@ -1,1 +1,1 @@
-"""Business logic services."""
+"""CareLink Backend — services package."""

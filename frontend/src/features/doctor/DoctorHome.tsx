@@ -34,7 +34,7 @@ export function DoctorHome() {
   return (
     <div className="pb-safe-nav">
       {/* AI clinical history link */}
-      {useAppStore.getState().kioskSession?.summary && (
+      {useAppStore.getState().intakeSession?.summary && (
         <div className="mx-4 mt-2">
           <button onClick={() => setView("DOCTOR_CLINICAL")}
             className="flex w-full items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/5 p-2.5 text-xs font-medium text-violet-700 card-soft transition-colors hover:bg-violet-500/10">
@@ -159,7 +159,7 @@ export function DoctorHome() {
             ))}
             {queue.length === 0 && (
               <div className="rounded-2xl border border-dashed border-border bg-card/50 p-5 text-center text-sm text-muted-foreground">
-                No patients in the queue yet. Patients captured at the reception/clinic kiosk will appear here.
+                No patients in the queue yet. Patients captured at the reception/clinic intake will appear here.
               </div>
             )}
           </div>

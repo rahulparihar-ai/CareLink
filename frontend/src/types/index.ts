@@ -494,7 +494,7 @@ export interface SleepData {
 // CARE LINK - AI Clinical History Platform Types
 // ------------------------------------------------------------------
 
-export type KioskPhase =
+export type IntakePhase =
   | "welcome"
   | "identify"
   | "consent"
@@ -669,11 +669,11 @@ export interface PhysicianSummary {
   verificationStatus: "pending" | "accepted" | "edited" | "rejected";
 }
 
-// Kiosk session state
-export interface KioskSession {
+// Intake session state
+export interface IntakeSession {
   id: string;
   patientId?: string;
-  phase: KioskPhase;
+  phase: IntakePhase;
   inputMode: InputMode;
   historyMode: HistoryMode;
   language: LanguageCode;

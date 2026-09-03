@@ -23,7 +23,7 @@ interface Service {
 }
 
 const services: Service[] = [
-  { key: "kiosk", label: "Care Link", sub: "AI history & documents", icon: Sparkles, tone: "bg-primary/10 text-primary", view: "KIOSK_HOME", primary: true },
+  { key: "intake", label: "Care Link", sub: "AI history & documents", icon: Sparkles, tone: "bg-primary/10 text-primary", view: "INTAKE_HOME", primary: true },
   { key: "register", label: "Register Patient", sub: "Form / Aadhaar QR", icon: UserPlus, tone: "bg-pink-500/10 text-pink-600", view: "REGISTER_PATIENT" },
   { key: "scan", label: "Scan Prescription", sub: "Send to Doctor Desk", icon: ScanLine, tone: "bg-primary/10 text-primary", view: "SCAN_PRESCRIPTION" },
   { key: "lab", label: "Lab Reports", sub: "Investigations", icon: FlaskConical, tone: "bg-violet-500/10 text-violet-600", view: "LAB_REPORTS" },
@@ -88,15 +88,15 @@ export function HospitalHome() {
           </div>
         )}
 
-        {/* Care Link kiosk banner */}
+        {/* Care Link intake banner */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           className="mb-4 mt-3 overflow-hidden rounded-2xl bg-primary text-primary-foreground card-soft">
-          <button onClick={() => setView("KIOSK_HOME")} className="flex w-full items-center gap-3 p-4 text-left">
+          <button onClick={() => setView("INTAKE_HOME")} className="flex w-full items-center gap-3 p-4 text-left">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/15">
               <Sparkles className="size-6" />
             </span>
             <span className="flex-1">
-              <span className="flex items-center gap-2 text-sm font-bold">Care Link kiosk <span className="rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-semibold uppercase">AI</span></span>
+              <span className="flex items-center gap-2 text-sm font-bold">Care Link intake <span className="rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-semibold uppercase">AI</span></span>
               <span className="block text-xs text-white/85">Record your history &amp; scan your documents before the consultation</span>
             </span>
             <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>

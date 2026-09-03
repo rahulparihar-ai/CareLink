@@ -53,7 +53,7 @@ export function actionToView(action: AiAssistantAction, role: "PATIENT" | "DOCTO
     case "OPEN_ABHA":
       return role === "PATIENT" ? "PATIENT_ABHA" : null;
     case "OPEN_CONSENT":
-      // Consent forms are captured during registration / kiosk case-taking.
+      // Consent forms are captured during registration / intake case-taking.
       return role === "PATIENT" ? "REGISTER" : null;
     case "OPEN_DOCUMENT_CENTER":
       return role === "PATIENT" ? "PATIENT_DOCUMENTS" : null;
