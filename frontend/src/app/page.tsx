@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppStore } from "@/store";
-import { guardView } from "@/lib/routing";
+import { guardView } from "@/routes";
 import { SplashView } from "@/features/SplashView";
 import { WelcomeView } from "@/features/auth/WelcomeView";
 import { LanguageSelectView } from "@/features/auth/LanguageSelectView";
@@ -14,17 +14,15 @@ import { OTPView } from "@/features/auth/OTPView";
 import { RegisterView } from "@/features/auth/RegisterView";
 import { DoctorRegisterView } from "@/features/auth/DoctorRegisterView";
 import { AccessibilityView } from "@/features/auth/AccessibilityView";
+import { ThemeSelectView } from "@/features/auth/ThemeSelectView";
 import { HelpAssistantView } from "@/features/auth/HelpAssistantView";
+import { AiAssistantView } from "@/features/ai/AiAssistantView";
 
-// Hospital (Swasthya-style)
+// Hospital (Reception / Doctor desk features)
 import { HospitalHome } from "@/features/hospital/HospitalHome";
-import { ConsultantScheduleView } from "@/features/hospital/ConsultantScheduleView";
-import { TariffView } from "@/features/hospital/TariffView";
-import { RosterView } from "@/features/hospital/RosterView";
 import { RegisterPatientView } from "@/features/hospital/RegisterPatientView";
 import { LabReportsView } from "@/features/hospital/LabReportsView";
 import { ScanPrescriptionView } from "@/features/hospital/ScanPrescriptionView";
-import { DoctorDeskView } from "@/features/hospital/DoctorDeskView";
 
 // Patient
 import { PatientHome } from "@/features/patient/PatientHome";
@@ -41,7 +39,6 @@ import { PatientAbhaView } from "@/features/patient/PatientAbhaView";
 import { PatientInsuranceView } from "@/features/patient/PatientInsuranceView";
 import { PatientVaccinationView } from "@/features/patient/PatientVaccinationView";
 import { PatientAppointmentsView } from "@/features/patient/PatientAppointmentsView";
-import { PatientBookAppointmentView } from "@/features/patient/PatientBookAppointmentView";
 import { PatientAiView } from "@/features/patient/PatientAiView";
 import { PatientIntakeView } from "@/features/patient/PatientIntakeView";
 import { PatientWellnessView } from "@/features/patient/PatientWellnessView";
@@ -62,10 +59,12 @@ import { DoctorCasesView } from "@/features/doctor/DoctorCasesView";
 import { DoctorNotesView } from "@/features/doctor/DoctorNotesView";
 import { DoctorPrescriptionsView } from "@/features/doctor/DoctorPrescriptionsView";
 import { DoctorFollowupsView } from "@/features/doctor/DoctorFollowupsView";
+import { DoctorConsultationView } from "@/features/doctor/DoctorConsultationView";
 
 import { PinLockScreen } from "@/components/shared/PinLockScreen";
+import { AudioGuidedAnnouncer } from "@/components/shared/AudioGuidedAnnouncer";
 
-// MediKiosk
+// Care Link kiosk
 import { KioskHome } from "@/features/kiosk/KioskHome";
 import { KioskIdentify } from "@/features/kiosk/KioskIdentify";
 import { KioskConsent } from "@/features/kiosk/KioskConsent";
@@ -80,6 +79,10 @@ export default function MobileApp() {
   const role = useAppStore((s) => s.role);
   const pinEnabled = useAppStore((s) => s.pinEnabled);
   const isUnlocked = useAppStore((s) => s.isUnlocked);
+  const largeText = useAppStore((s) => s.largeText);
+  const highContrast = useAppStore((s) => s.highContrast);
+  const reducedMotion = useAppStore((s) => s.reducedMotion);
+  const audioGuided = useAppStore((s) => s.audioGuided);
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -92,7 +95,7 @@ export default function MobileApp() {
   // belong to the active role, and never a portal while logged out.
   const view = guardView(currentView, role);
 
-  const lockedOnly = ["SPLASH", "WELCOME", "LANGUAGE", "ROLE_SELECT", "LOGIN", "DOCTOR_LOGIN", "OTP", "REGISTER", "ACCESSIBILITY", "HELP"];
+  const lockedOnly = ["SPLASH", "WELCOME", "LANGUAGE", "ROLE_SELECT", "LOGIN", "DOCTOR_LOGIN", "OTP", "REGISTER", "ACCESSIBILITY", "THEME", "HELP", "AI_ASSISTANT"];
   if (
     pinEnabled &&
     !isUnlocked &&
@@ -102,6 +105,11 @@ export default function MobileApp() {
   }
 
   const base = "app-shell min-h-dvh";
+
+  const a11yClass =
+    (largeText ? " ck-large-text " : "") +
+    (highContrast ? " ck-high-contrast " : "") +
+    (reducedMotion ? " ck-reduced-motion " : "");
 
   let content: React.ReactNode;
 
@@ -136,11 +144,17 @@ export default function MobileApp() {
     case "ACCESSIBILITY":
       content = <AccessibilityView />;
       break;
+    case "THEME":
+      content = <ThemeSelectView />;
+      break;
     case "HELP":
       content = <HelpAssistantView />;
       break;
+    case "AI_ASSISTANT":
+      content = <AiAssistantView />;
+      break;
 
-    // MediKiosk
+    // Care Link kiosk
     case "KIOSK_HOME":
       content = <KioskHome />;
       break;
@@ -166,26 +180,11 @@ export default function MobileApp() {
       content = <DoctorClinicalView />;
       break;
 
-    // Hospital hub
+    // Hospital / Reception desk
     case "HOSPITAL_HOME":
       content = <HospitalHome />;
       break;
-    case "CONSULTANT_SCHEDULE":
-      content = <ConsultantScheduleView />;
-      break;
-    case "CONSULTANT_DETAIL":
-      content = <ConsultantScheduleView />;
-      break;
-    case "TARIFF":
-      content = <TariffView />;
-      break;
-    case "ROSTER":
-      content = <RosterView />;
-      break;
     case "REGISTER_PATIENT":
-      content = <RegisterPatientView />;
-      break;
-    case "AADHAAR_SCAN":
       content = <RegisterPatientView />;
       break;
     case "LAB_REPORTS":
@@ -193,9 +192,6 @@ export default function MobileApp() {
       break;
     case "SCAN_PRESCRIPTION":
       content = <ScanPrescriptionView />;
-      break;
-    case "DOCTOR_DESK":
-      content = <DoctorDeskView />;
       break;
 
     // Patient
@@ -240,9 +236,6 @@ export default function MobileApp() {
       break;
     case "PATIENT_APPOINTMENTS":
       content = <PatientAppointmentsView />;
-      break;
-    case "PATIENT_BOOK_APPOINTMENT":
-      content = <PatientBookAppointmentView />;
       break;
     case "PATIENT_AI":
       content = <PatientAiView />;
@@ -300,6 +293,9 @@ export default function MobileApp() {
     case "DOCTOR_FOLLOWUPS":
       content = <DoctorFollowupsView />;
       break;
+    case "DOCTOR_CONSULTATION":
+      content = <DoctorConsultationView />;
+      break;
 
     default:
       content = <RoleSelectView />;
@@ -308,7 +304,8 @@ export default function MobileApp() {
 
   return (
     <div className="app-backdrop">
-      <div className={base}>
+      <div className={base + a11yClass} data-audio-guided={audioGuided || undefined}>
+        <AudioGuidedAnnouncer view={view} />
         <AnimatePresence mode="wait">
           <motion.div
             key={view}

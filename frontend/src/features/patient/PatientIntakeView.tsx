@@ -12,11 +12,11 @@ import {
   Check,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { Button } from "@/components/ui/button";
 import { symptomChips, bodyAreas } from "@/data/demo";
 import { transcribeDemo } from "@/services/voiceService";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 type InputMode = "voice" | "text" | "touch";
 

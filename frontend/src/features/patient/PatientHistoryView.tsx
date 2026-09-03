@@ -17,9 +17,9 @@ import {
   Dumbbell,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 interface HistorySection {
   key: string;

@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAppStore } from "@/store";
-import { postOtpDestination } from "@/lib/routing";
+import { postOtpDestination } from "@/routes";
 import { verifyOtp } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export function OTPView() {
   const { t } = useTranslation();

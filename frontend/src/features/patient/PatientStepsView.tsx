@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Footprints, TrendingUp, Info } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 
 export function PatientStepsView() {
   const setView = useAppStore((s) => s.setView);

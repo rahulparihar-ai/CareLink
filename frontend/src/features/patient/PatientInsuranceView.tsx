@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, Plus, Upload, Eye, Lock, FileText } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { EmptyState } from "@/components/shared/primitive";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";

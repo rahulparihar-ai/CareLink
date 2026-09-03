@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CareLink
 
-## Getting Started
+CareLink is a multilingual, themeable patient + doctor platform with a voice/text AI assistant layer. This repository is organised into a modular structure.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+CareLink/
+│
+├── frontend/    # Patient + Doctor UI (Next.js 16, React, TypeScript, Tailwind v4)
+├── backend/     # APIs + Authentication + Business Logic (FastAPI — scaffold)
+├── ai/          # AI features: conversation, translation, OCR, red flags (scaffold)
+├── database/    # Database + Schema + Migrations (scaffold)
+└── docs/        # architecture / api / database / workflows
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Why this structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **frontend/** — all user-facing UI and client state (Zustand). Runs standalone in mock mode today.
+- **backend/** — APIs, auth, business logic. Currently a scaffold; see `backend/README.md`.
+- **ai/** — server-side AI pipelines. The frontend already wires cold AI via `frontend/src/app/api/ai/chat/route.ts`.
+- **database/** — persistence. Not yet wired; frontend runs on browser-local mock state.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Frontend
 
-## Learn More
+```bash
+cd frontend
+npm install
+npm run dev        # http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+Verification:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx tsc --noEmit    # typecheck
+npm run lint        # eslint
+npm test            # vitest (incl. i18n parity for 13 languages)
+npm run build       # production build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Backend (scaffold)
 
-## Deploy on Vercel
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Configuration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `.env.example`. Secret env vars are **server-side only** — never `NEXT_PUBLIC_*` for AI/database keys.
+
+## Guardrails
+
+- **REUSE > EXTEND > CREATE** — do not rewrite or delete working features.
+- No fabricated patient or personal medical data in production surfaces; show empty states when the backend is unavailable.
+- Aadhaar linking is a UI flow and does not imply stored medical history; health-record import requires ABDM/ABHA + explicit patient consent.

@@ -3,9 +3,9 @@
 import { motion } from "framer-motion";
 import { CalendarDays, FileText, MessageSquare, CalendarClock, HeartPulse, ShieldCheck, CheckCheck, Bell } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { EmptyState } from "@/components/shared/primitive";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 const typeIcon: Record<string, { icon: React.ComponentType<{ className?: string }>; bg: string }> = {
   appointment: { icon: CalendarDays, bg: "bg-primary/10 text-primary" },

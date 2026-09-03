@@ -10,8 +10,9 @@ import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { KioskProgress } from "./KioskProgress";
 import { SUMMARY_SERVICE } from "@/services";
-import { cn } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { generatePatientId } from "@/lib/brand/constants";
+import { cn } from "@/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { PhysicianSummary } from "@/types";
 
 export function KioskSummary() {
@@ -29,7 +30,7 @@ export function KioskSummary() {
     const gen = async () => {
       try {
         const res = await SUMMARY_SERVICE.generate(
-          kiosk?.patientId ?? "CL-2026-000124",
+          kiosk?.patientId ?? generatePatientId(),
           kiosk?.clinicalHistory ?? null,
           kiosk?.documents ?? [],
           kiosk?.redFlags ?? [],
@@ -100,7 +101,7 @@ export function KioskSummary() {
                 const gen = async () => {
                   try {
                     const res = await SUMMARY_SERVICE.generate(
-                      kiosk?.patientId ?? "CL-2026-000124",
+                      kiosk?.patientId ?? generatePatientId(),
                       kiosk?.clinicalHistory ?? null,
                       kiosk?.documents ?? [],
                       kiosk?.redFlags ?? [],

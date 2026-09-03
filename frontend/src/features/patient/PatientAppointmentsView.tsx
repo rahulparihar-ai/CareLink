@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CalendarDays, MapPin, Plus, Stethoscope, CheckCircle2, XCircle } from "lucide-react";
+import { CalendarDays, MapPin, Stethoscope, CheckCircle2, XCircle } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { EmptyState } from "@/components/shared/primitive";
 import { StatusBadge, statusVariant } from "@/components/shared/StatusBadge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import type { Appointment } from "@/types";
 
 const tabs = ["upcoming", "completed", "cancelled"] as const;
@@ -46,11 +46,6 @@ export function PatientAppointmentsView() {
       title="Appointments"
       currentTab="PATIENT_APPOINTMENTS"
       onBack={() => setView("PATIENT_HOME")}
-      right={
-        <button onClick={() => setView("PATIENT_BOOK_APPOINTMENT")} className="flex items-center gap-1 rounded-lg bg-primary px-2.5 py-1.5 text-xs font-medium text-primary-foreground">
-          <Plus className="size-3.5" /> Book
-        </button>
-      }
     >
       {confirmed && (
         <div className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3 text-xs text-emerald-700">
@@ -67,8 +62,7 @@ export function PatientAppointmentsView() {
       </div>
 
       {filtered.length === 0 ? (
-        <EmptyState title={`No ${tab} appointments`} hint={tab === "upcoming" ? "Book a new appointment to get started." : undefined}
-          action={tab === "upcoming" ? "Book Appointment" : undefined} onAction={() => setView("PATIENT_BOOK_APPOINTMENT")} icon={CalendarDays} />
+        <EmptyState title={`No ${tab} appointments`} icon={CalendarDays} />
       ) : (
         <div className="space-y-2.5">
           {filtered.map((a, i) => (
@@ -101,9 +95,6 @@ export function PatientAppointmentsView() {
                   <div className="mt-2 rounded-xl border border-border bg-muted/40 p-3">
                     <button onClick={() => doCancel(a.id)} className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-red-500/10 py-2 text-sm font-medium text-red-600">
                       <XCircle className="size-4" /> Cancel this appointment
-                    </button>
-                    <button onClick={() => setView("PATIENT_BOOK_APPOINTMENT")} className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary/10 py-2 text-sm font-medium text-primary">
-                      <CalendarDays className="size-4" /> Book a new slot
                     </button>
                   </div>
                 </motion.div>

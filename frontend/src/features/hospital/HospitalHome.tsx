@@ -2,13 +2,13 @@
 
 import { motion } from "framer-motion";
 import {
-  CalendarDays, Wallet, ClipboardList, FlaskConical, ScanLine, UserPlus,
-  Stethoscope, ChevronRight, Building2, ShieldCheck, Info, Sparkles,
+  FlaskConical, ScanLine, UserPlus,
+  ChevronRight, Building2, Info, Sparkles,
 } from "lucide-react";
 import { useAppStore } from "@/store";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
-import { NavigationDrawer } from "@/components/shared/NavigationDrawer";
-import { HospitalBottomNav } from "@/components/shared/BottomNav";
+import { NavigationDrawer } from "@/layouts/NavigationDrawer";
+import { HospitalBottomNav } from "@/layouts/BottomNav";
 import { BRAND } from "@/lib/brand/constants";
 import { useState } from "react";
 
@@ -23,14 +23,10 @@ interface Service {
 }
 
 const services: Service[] = [
-  { key: "kiosk", label: "MediKiosk", sub: "AI history & documents", icon: Sparkles, tone: "bg-primary/10 text-primary", view: "KIOSK_HOME", primary: true },
-  { key: "schedule", label: "Consultant Schedule", sub: "Dept-wise", icon: CalendarDays, view: "CONSULTANT_SCHEDULE", tone: "bg-sky-500/10 text-sky-600" },
-  { key: "tariff", label: "Tariff", sub: "Service charges", icon: Wallet, tone: "bg-emerald-500/10 text-emerald-600", view: "TARIFF" },
-  { key: "roster", label: "Roster Enquiry", sub: "Doctor duty", icon: ClipboardList, tone: "bg-amber-500/10 text-amber-600", view: "ROSTER" },
-  { key: "lab", label: "Lab Reports", sub: "Investigations", icon: FlaskConical, tone: "bg-violet-500/10 text-violet-600", view: "LAB_REPORTS" },
+  { key: "kiosk", label: "Care Link", sub: "AI history & documents", icon: Sparkles, tone: "bg-primary/10 text-primary", view: "KIOSK_HOME", primary: true },
   { key: "register", label: "Register Patient", sub: "Form / Aadhaar QR", icon: UserPlus, tone: "bg-pink-500/10 text-pink-600", view: "REGISTER_PATIENT" },
   { key: "scan", label: "Scan Prescription", sub: "Send to Doctor Desk", icon: ScanLine, tone: "bg-primary/10 text-primary", view: "SCAN_PRESCRIPTION" },
-  { key: "doctor", label: "Doctor Desk", sub: "For clinicians", icon: Stethoscope, tone: "bg-red-500/10 text-red-600", view: "DOCTOR_DESK" },
+  { key: "lab", label: "Lab Reports", sub: "Investigations", icon: FlaskConical, tone: "bg-violet-500/10 text-violet-600", view: "LAB_REPORTS" },
 ];
 
 export function HospitalHome() {
@@ -40,11 +36,6 @@ export function HospitalHome() {
   const setRole = useAppStore((s) => s.setRole);
 
   const dispatch = async (svc: Service) => {
-    if (svc.view === "DOCTOR_DESK") {
-      setRole("DOCTOR");
-      setView("DOCTOR_HOME");
-      return;
-    }
     if (svc.view === "LAB_REPORTS" && !role) {
       setRole("PATIENT");
     }
@@ -97,7 +88,7 @@ export function HospitalHome() {
           </div>
         )}
 
-        {/* MediKiosk banner */}
+        {/* Care Link kiosk banner */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           className="mb-4 mt-3 overflow-hidden rounded-2xl bg-primary text-primary-foreground card-soft">
           <button onClick={() => setView("KIOSK_HOME")} className="flex w-full items-center gap-3 p-4 text-left">
@@ -105,7 +96,7 @@ export function HospitalHome() {
               <Sparkles className="size-6" />
             </span>
             <span className="flex-1">
-              <span className="flex items-center gap-2 text-sm font-bold">MediKiosk <span className="rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-semibold uppercase">AI</span></span>
+              <span className="flex items-center gap-2 text-sm font-bold">Care Link kiosk <span className="rounded-full bg-white/20 px-2 py-0.5 text-[9px] font-semibold uppercase">AI</span></span>
               <span className="block text-xs text-white/85">Record your history &amp; scan your documents before the consultation</span>
             </span>
             <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
@@ -136,31 +127,7 @@ export function HospitalHome() {
           ))}
         </motion.div>
 
-        {/* Department quick browse */}
-        <section className="mt-5 pb-24">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Departments</h2>
-          </div>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {["General Medicine", "Cardiology", "Dermatology", "Pediatrics", "Orthopedics", "Gynecology"].map((d) => (
-              <button key={d} onClick={() => setView("CONSULTANT_SCHEDULE")}
-                className="shrink-0 rounded-full border border-border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary">
-                {d}
-              </button>
-            ))}
-          </div>
-          <button onClick={() => setView("CONSULTANT_SCHEDULE")}
-            className="mt-3 flex w-full items-center justify-between rounded-2xl border border-border bg-card p-4 card-soft">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="size-5 text-primary" />
-              <div className="text-left">
-                <p className="text-sm font-semibold">View All Departments</p>
-                <p className="text-xs text-muted-foreground">Consultant schedule &amp; availability</p>
-              </div>
-            </div>
-            <ChevronRight className="size-4 text-muted-foreground" />
-          </button>
-        </section>
+        <div className="pb-24" />
 
         <CareLinkLogo size="sm" withWordmark={false} />
       </div>

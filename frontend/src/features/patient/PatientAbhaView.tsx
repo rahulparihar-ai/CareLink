@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ShieldCheck, Link2, Keyboard, ScanQrCode, ArrowRight, FileText, HeartHandshake, User } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 
 export function PatientAbhaView() {

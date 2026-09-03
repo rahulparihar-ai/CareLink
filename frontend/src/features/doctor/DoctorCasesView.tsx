@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Files, ChevronRight, CheckCircle2, Clock } from "lucide-react";
 import { useAppStore } from "@/store";
-import { DoctorPageShell } from "@/components/shared/DoctorPageShell";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
 import { StatusBadge, statusVariant } from "@/components/shared/StatusBadge";
 
 export function DoctorCasesView() {

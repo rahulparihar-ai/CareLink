@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { AlertTriangle, ChevronRight, ShieldAlert, Flag } from "lucide-react";
 import { useAppStore } from "@/store";
-import { DoctorPageShell } from "@/components/shared/DoctorPageShell";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
 import { StatusBadge, statusVariant } from "@/components/shared/StatusBadge";
 
 const order = { URGENT: 0, NEEDS_REVIEW: 1, HIGH: 2, NORMAL: 3 };

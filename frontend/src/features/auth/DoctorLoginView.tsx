@@ -1,16 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ChevronLeft, ArrowRight, Stethoscope, IdCard, Lock, ShieldCheck, Info } from "lucide-react";
+import { ChevronLeft, ArrowRight, Stethoscope, IdCard, Lock, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useAppStore } from "@/store";
-import { useTranslation } from "@/lib/i18n/useTranslation";
-import { doctorLoginDestination } from "@/lib/routing";
+import { useTranslation } from "@/i18n/useTranslation";
 import { Button } from "@/components/ui/button";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
-
-const DEMO_DOCTOR_ID = "DOC-001";
-const DEMO_PASSWORD = "hospital123";
 
 export function DoctorLoginView() {
   const { t } = useTranslation();
@@ -23,6 +19,7 @@ export function DoctorLoginView() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [forgot, setForgot] = useState(false);
 
   const confirmLogin = () => {
     const id = doctorId.trim();
@@ -35,18 +32,21 @@ export function DoctorLoginView() {
       return;
     }
 
-    // Hospital-issued credentials. In a demo, a returning doctor may use their
-    // saved credentials, otherwise fall back to the sample hospital-issued pair.
+    // Credentials are verified against the doctor's own CareLink account.
+    // The CareLink Doctor ID is the unique account ID issued at registration;
+    // it is NOT the NMC/HPR/HP-ID or hospital ID, and NOT a demo credential.
     const matchesStored =
-      doctorProfile && doctorProfile.doctorId === id && doctorProfile.password === password;
-    if (!matchesStored && !(id === DEMO_DOCTOR_ID && password === DEMO_PASSWORD)) {
+      doctorProfile &&
+      (doctorProfile.id === id || doctorProfile.doctorId === id) &&
+      doctorProfile.password === password;
+    if (!matchesStored) {
       setError(t("doc.login.invalid"));
       return;
     }
 
     setRole("DOCTOR");
     setLoginDoctorId(id);
-    setView(doctorLoginDestination(doctorProfile != null));
+    setView("DOCTOR_HOME");
   };
 
   return (
@@ -73,11 +73,9 @@ export function DoctorLoginView() {
           <p className="mt-1 text-sm text-muted-foreground">{t("doc.login.hint")}</p>
         </motion.div>
 
-        <div className="mt-6 flex items-start gap-2 rounded-xl border border-primary/30 bg-primary/5 p-3 text-xs text-primary">
-          <Info className="mt-0.5 size-4 shrink-0" />
-          <span>
-            {t("doc.login.demoPrefix")} {DEMO_DOCTOR_ID} · {DEMO_PASSWORD}
-          </span>
+        <div className="mt-6 flex items-start gap-2 rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+          <span>{t("doc.login.idHint")}</span>
         </div>
 
         <motion.div
@@ -96,7 +94,7 @@ export function DoctorLoginView() {
                   setDoctorId(e.target.value);
                   setError("");
                 }}
-                placeholder="DOC-001"
+                placeholder="DR-2026-000000"
                 className="w-full rounded-xl border border-input bg-card py-3.5 pl-12 pr-4 text-base outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/30"
               />
             </div>
@@ -135,9 +133,26 @@ export function DoctorLoginView() {
         <Button onClick={confirmLogin} size="lg" className="h-14 w-full text-base">
           {t("doc.login.continue")} <ArrowRight className="ml-1.5" />
         </Button>
-        <p className="mt-4 flex items-center justify-center gap-1 text-center text-xs text-muted-foreground">
+        <button
+          type="button"
+          onClick={() => setForgot((v) => !v)}
+          className="mt-3 w-full text-center text-xs font-medium text-primary"
+          aria-expanded={forgot}
+        >
+          {t("doc.login.forgotPassword")}
+        </button>
+        {forgot && (
+          <p className="mt-2 text-center text-xs text-muted-foreground">{t("doc.login.forgotReady")}</p>
+        )}
+        <p className="mt-3 flex items-center justify-center gap-1 text-center text-xs text-muted-foreground">
           <ShieldCheck className="size-3.5" /> {t("doc.login.secureHint")}
         </p>
+        <button
+          onClick={() => setView("DOCTOR_REGISTER")}
+          className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card py-3 text-sm font-semibold text-primary"
+        >
+          <Stethoscope className="size-4" /> {t("doc.login.join")}
+        </button>
       </div>
     </div>
   );

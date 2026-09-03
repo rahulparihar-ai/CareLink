@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { User, Stethoscope } from "lucide-react";
 import { useAppStore } from "@/store";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export function RoleSelectView() {
   const { t } = useTranslation();

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScanLine, Camera, FileText, Check, Upload, Loader2, ShieldCheck } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
 import { Button } from "@/components/ui/button";
 
 type Phase = "idle" | "scanning" | "review" | "sent";
@@ -40,7 +40,7 @@ export function ScanPrescriptionView() {
   };
 
   return (
-    <PatientPageShell title="Scan Prescription" currentTab="HOSPITAL_HOME" onBack={() => setView("HOSPITAL_HOME")}>
+    <DoctorPageShell title="Scan Prescription" currentTab="DOCTOR_HOME" onBack={() => setView("DOCTOR_HOME")}>
       <AnimatePresence mode="wait">
         {phase === "idle" && (
           <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center py-10 text-center">
@@ -106,7 +106,7 @@ export function ScanPrescriptionView() {
             </div>
             <h2 className="mt-5 text-lg font-bold">Prescription sent</h2>
             <p className="mt-1 text-sm text-muted-foreground">Your prescription has been sent to the Doctor Desk for review.</p>
-            <Button onClick={() => setView("HOSPITAL_HOME")} className="mt-6">Back to home</Button>
+            <Button onClick={() => setView("DOCTOR_HOME")} className="mt-6">Back to home</Button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -115,6 +115,6 @@ export function ScanPrescriptionView() {
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
         This is a simulated prescription scan for demo. No real OCR or ABDM integration is active.
       </div>
-    </PatientPageShell>
+    </DoctorPageShell>
   );
 }

@@ -4,9 +4,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, ChevronRight, Flag } from "lucide-react";
 import { useAppStore } from "@/store";
-import { DoctorPageShell } from "@/components/shared/DoctorPageShell";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
 import { StatusBadge, statusVariant } from "@/components/shared/StatusBadge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 const filters = ["All", "URGENT", "NEEDS_REVIEW", "WAITING", "COMPLETED"] as const;
 

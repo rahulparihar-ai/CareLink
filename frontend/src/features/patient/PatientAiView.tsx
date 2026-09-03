@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, FileText } from "lucide-react";
+import { Send, FileText } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
-import { askAi } from "@/services/aiService";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
+import { askAi, type AiRecordContext } from "@/services/aiService";
 import { AIDisclaimer } from "@/components/shared/primitive";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 interface Message {
   role: "user" | "ai";
@@ -24,6 +24,10 @@ const suggestions = [
 
 export function PatientAiView() {
   const setView = useAppStore((s) => s.setView);
+  const medications = useAppStore((s) => s.medications);
+  const appointments = useAppStore((s) => s.appointments);
+  const labReports = useAppStore((s) => s.labReports);
+  const patientProfile = useAppStore((s) => s.patientProfile);
   const [messages, setMessages] = useState<Message[]>([
     { role: "ai", text: "Hello! I'm CareLink AI. Ask me about your health records, documents, or anything about your care." },
   ]);
@@ -41,14 +45,20 @@ export function PatientAiView() {
     setMessages((m) => [...m, { role: "user", text }]);
     setInput("");
     setTyping(true);
-    const res = await askAi(text);
+    const ctx: AiRecordContext = {
+      medications: medications.map((m) => `${m.name} ${m.strength ?? ""}`.trim()),
+      appointments: appointments.map((a) => ({ doctor: a.doctorName, date: a.date, time: a.time })),
+      lastLab: labReports[0] ? { title: labReports[0].title, date: labReports[0].date, status: labReports[0].status } : null,
+      bloodGroup: patientProfile?.bloodGroup ?? "",
+      allergies: patientProfile?.allergies ? patientProfile.allergies.split(",").map((x) => x.trim()).filter(Boolean) : [],
+    };
+    const res = await askAi(text, ctx);
     setTyping(false);
     setMessages((m) => [...m, { role: "ai", text: res.text, sources: res.sources }]);
   };
 
   return (
-    <PatientPageShell title="CareLink AI" currentTab="PATIENT_AI" onBack={() => setView("PATIENT_HOME")} noBottomNav
-      right={<span className="flex items-center gap-1 rounded-full bg-[var(--gold-soft)] px-2 py-0.5 text-[10px] font-medium text-[var(--gold-foreground)]"><Sparkles className="size-3" /> Demo</span>}>
+    <PatientPageShell title="CareLink AI" currentTab="PATIENT_AI" onBack={() => setView("PATIENT_HOME")} noBottomNav>
       {/* Chat area */}
       <div ref={scrollRef} className="h-[calc(100dvh-230px)] space-y-3 overflow-y-auto pb-4">
         {messages.map((m, i) => (

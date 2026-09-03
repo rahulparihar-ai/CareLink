@@ -9,7 +9,7 @@ import {
 import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { CONSENT_SERVICE } from "@/services";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export function KioskComplete() {
   const setView = useAppStore((s) => s.setView);

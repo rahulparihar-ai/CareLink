@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FlaskConical, TrendingUp } from "lucide-react";
+import { FlaskConical } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
-import { SyntheticNote, EmptyState } from "@/components/shared/primitive";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
+import { EmptyState } from "@/components/shared/primitive";
 import { statusVariant, StatusBadge } from "@/components/shared/StatusBadge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 export function PatientLabView() {
   const setView = useAppStore((s) => s.setView);
@@ -26,10 +26,6 @@ export function PatientLabView() {
 
   return (
     <PatientPageShell title="Lab Reports" currentTab="PATIENT_HISTORY" onBack={() => setView("PATIENT_DOCUMENTS")}>
-      <div className="mb-3 flex items-center gap-2">
-        <SyntheticNote text="Synthetic demo values" />
-      </div>
-
       {/* Report list */}
       <div className="mb-4 flex gap-2 overflow-x-auto no-scrollbar">
         {reports.map((r) => (
@@ -68,11 +64,6 @@ export function PatientLabView() {
                 </div>
               </motion.div>
             ))}
-          </div>
-
-          <div className="mt-3 flex items-center gap-2 rounded-xl border border-primary/15 bg-primary/5 p-2.5 text-xs text-muted-foreground">
-            <TrendingUp className="size-4 shrink-0 text-primary" />
-            This is a synthetic demo report. No real clinical values.
           </div>
         </div>
       )}

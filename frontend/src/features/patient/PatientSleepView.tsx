@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Moon, Sunrise, Sunset, Clock, Info } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 
 export function PatientSleepView() {
   const setView = useAppStore((s) => s.setView);

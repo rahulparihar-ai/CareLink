@@ -7,8 +7,8 @@ import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { KioskProgress } from "./KioskProgress";
 import { CONSENT_OPTIONS, CONSENT_SERVICE, type ConsentType } from "@/services";
-import { cn } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { cn } from "@/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export function KioskConsent() {
   const setView = useAppStore((s) => s.setView);

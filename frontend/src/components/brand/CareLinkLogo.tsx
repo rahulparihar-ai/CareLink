@@ -1,7 +1,7 @@
 "use client";
 
 import { HeartPulse } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { useAppStore } from "@/store";
 
 export function CareLinkLogo({

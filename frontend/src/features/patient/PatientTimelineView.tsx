@@ -12,9 +12,9 @@ import {
   History,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { EmptyState } from "@/components/shared/primitive";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import type { TimelineEvent } from "@/types";
 
 const filters = [

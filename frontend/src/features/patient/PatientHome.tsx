@@ -19,19 +19,18 @@ import {
   Moon,
   HeartPulse,
   Upload,
-  CalendarPlus,
   Droplets,
   Syringe,
   Apple,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientHeader } from "@/components/shared/AppHeader";
-import { PatientBottomNav } from "@/components/shared/BottomNav";
-import { NavigationDrawer } from "@/components/shared/NavigationDrawer";
+import { PatientHeader } from "@/layouts/AppHeader";
+import { PatientBottomNav } from "@/layouts/BottomNav";
+import { NavigationDrawer } from "@/layouts/NavigationDrawer";
 import { SectionTitle, AIDisclaimer } from "@/components/shared/primitive";
 
-import { useTranslation } from "@/lib/i18n/useTranslation";
-import { toneBg } from "@/lib/utils";
+import { useTranslation } from "@/i18n/useTranslation";
+import { toneBg } from "@/utils";
 
 export function PatientHome() {
   const { t } = useTranslation();
@@ -134,12 +133,6 @@ export function PatientHome() {
         <section className="mt-6">
           <SectionTitle title={t("home.quickActions")} />
           <div className="grid grid-cols-2 gap-3">
-            <QuickAction
-              icon={CalendarPlus}
-              label={t("home.bookAppointment")}
-              onClick={() => setView("PATIENT_BOOK_APPOINTMENT")}
-              tone="primary"
-            />
             <QuickAction
               icon={Upload}
               label={t("home.uploadReport")}

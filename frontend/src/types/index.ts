@@ -52,6 +52,9 @@ export interface PatientProfile {
   gender: string;
   dateOfBirth?: string;
   mobileNumber: string;
+  password?: string;
+  email?: string;
+  address?: string;
   language?: string;
   emergencyContact?: string;
   abhaStatus?: string;
@@ -75,13 +78,40 @@ export interface DoctorProfile {
   specialization: string;
   facility: string;
   mobileNumber?: string;
+  email?: string;
+  gender?: string;
   professionalId?: string;
   doctorId?: string;
+  loginId?: string;
   password?: string;
   languages?: string[];
   avatarColor?: string;
   experience?: string;
   availability?: string;
+  mobileVerified?: boolean;
+  // Professional type: drives which credential fields are shown (spec §1).
+  professionType?: "medical-doctor" | "nurse" | "allied" | "other";
+  // --- Professional registration (spec §5, §29) ---
+  dateOfBirth?: string;
+  profession?: string;
+  qualification?: string;
+  registrationNumber?: string;
+  council?: string;
+  state?: string;
+  registrationDate?: string;
+  // Verification is separate from workplace affiliation.
+  professionalVerification?: "verified" | "pending" | "failed";
+  identityVerified?: boolean;
+  // Practice type: Govt Hospital / Private Hospital / Clinic / Independent.
+  practiceType?: "government" | "private" | "clinic" | "independent";
+  workplace?: string;
+  workplaceType?: string;
+  workplaceVerified?: boolean;
+  affiliationStatus?: "approved" | "pending" | "none";
+  clinicRequest?: {
+    name: string;
+    status: "requested" | "approved" | "rejected";
+  };
 }
 
 export interface Medication {
@@ -269,6 +299,9 @@ export interface DoctorPatientRecord {
   prescriptions?: PrescriptionDraft[];
   aiSummary?: AiSummary;
   appointmentId?: string;
+  consultNotes?: StructuredNote[];
+  investigationRequests?: InvestigationRequest[];
+  documentRequests?: DocumentRequest[];
 }
 
 export interface AiSummary {
@@ -370,6 +403,34 @@ export interface PrescriptionDraft {
   confirmed: boolean;
 }
 
+// Investigation requested by the doctor (spec §22)
+export interface InvestigationRequest {
+  id: string;
+  investigation: string;
+  reason: string;
+  priority: "routine" | "urgent";
+  notes?: string;
+  createdAt: string;
+}
+
+// Missing information/document the doctor requests from the patient (spec §24)
+export interface DocumentRequest {
+  id: string;
+  title: string;
+  detail: string;
+  status: "pending" | "fulfilled";
+  createdAt: string;
+  fulfilledAt?: string;
+}
+
+// Structured clinical note for the consultation workspace (spec §20)
+export interface StructuredNote {
+  id: string;
+  section: "chief-complaint" | "history" | "examination" | "assessment" | "plan" | "advice" | "follow-up";
+  content: string;
+  updatedAt: string;
+}
+
 export interface NotificationPrefs {
   consultation: boolean;
   document: boolean;
@@ -430,7 +491,7 @@ export interface SleepData {
 }
 
 // ------------------------------------------------------------------
-// MEDIKIOSK - AI Clinical History Platform Types
+// CARE LINK - AI Clinical History Platform Types
 // ------------------------------------------------------------------
 
 export type KioskPhase =

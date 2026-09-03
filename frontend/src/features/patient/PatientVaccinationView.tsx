@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Syringe } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { EmptyState } from "@/components/shared/primitive";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 

@@ -4,9 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserPlus, QrCode, Keyboard, Check, ChevronRight, ShieldCheck, Loader2 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 type Step = "method" | "form" | "done";
 
@@ -24,13 +24,11 @@ export function RegisterPatientView() {
   const simulateAadhaar = async () => {
     setLoading(true);
     await new Promise((r) => setTimeout(r, 1800));
+    // Provisional demo: marks an Aadhaar reference as captured without
+    // fabricating a real person's identity. Demographics are filled by staff.
     setForm((f) => ({
       ...f,
-      name: "Sunita Devi",
-      dob: "1964-08-12",
-      gender: "Female",
-      address: "Village Khera, Rajasthan 342001",
-      aadhaar: "XXXX-XXXX-3847",
+      aadhaar: "XXXX-XXXX-XXXX",
     }));
     setLoading(false);
     setStep("form");
@@ -63,7 +61,7 @@ export function RegisterPatientView() {
 
   if (step === "done") {
     return (
-      <PatientPageShell title="Registration Complete" currentTab="HOSPITAL_HOME" onBack={() => setView("HOSPITAL_HOME")}>
+      <DoctorPageShell title="Registration Complete" currentTab="DOCTOR_HOME" onBack={() => setView("DOCTOR_HOME")}>
         <div className="flex flex-col items-center py-16 text-center">
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", damping: 12 }}
             className="flex size-20 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600">
@@ -78,15 +76,15 @@ export function RegisterPatientView() {
           </div>
           <div className="mt-6 flex gap-2">
             <Button variant="outline" onClick={() => { setStep("form"); setForm({ name: "", dob: "", gender: "Male", mobile: "", address: "", bloodGroup: "", aadhaar: "", abha: "" }); }}>Register another</Button>
-            <Button onClick={() => setView("HOSPITAL_HOME")}>Back to home</Button>
+            <Button onClick={() => setView("DOCTOR_HOME")}>Back to home</Button>
           </div>
         </div>
-      </PatientPageShell>
+      </DoctorPageShell>
     );
   }
 
   return (
-    <PatientPageShell title="Register Patient" currentTab="HOSPITAL_HOME" onBack={() => setView("HOSPITAL_HOME")}>
+    <DoctorPageShell title="Register Patient" currentTab="DOCTOR_HOME" onBack={() => setView("DOCTOR_HOME")}>
       {/* Step indicator */}
       <div className="mb-4 flex items-center gap-2">
         {(["method", "form"] as const).map((s, i) => (
@@ -136,7 +134,7 @@ export function RegisterPatientView() {
                 Auto-filled from Aadhaar QR. Please verify and complete.
               </div>
             )}
-            <Field label="Full Name" value={form.name} onChange={(v) => set("name", v)} placeholder="e.g. Sunita Devi" />
+            <Field label="Full Name" value={form.name} onChange={(v) => set("name", v)} placeholder="Full name" />
             <div className="grid grid-cols-2 gap-2">
               <Field label="Date of Birth" value={form.dob} onChange={(v) => set("dob", v)} type="date" />
               <div>
@@ -161,7 +159,7 @@ export function RegisterPatientView() {
           </motion.div>
         )}
       </AnimatePresence>
-    </PatientPageShell>
+    </DoctorPageShell>
   );
 }
 

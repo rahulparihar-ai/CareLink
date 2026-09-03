@@ -3,10 +3,10 @@
 import { useState } from "react";
 import {
   Users, AlertTriangle, ClipboardCheck, FileText,
-  CalendarDays, ChevronRight, Bell, Search, TrendingUp, Building2, Sparkles,
+  CalendarDays, ChevronRight, Bell, Search, TrendingUp, Sparkles,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { NavigationDrawer } from "@/components/shared/NavigationDrawer";
+import { NavigationDrawer } from "@/layouts/NavigationDrawer";
 import { StatusBadge, statusVariant } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +17,7 @@ export function DoctorHome() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const unread = useAppStore((s) => s.notifications.filter((n) => !n.read).length);
   const caseQueue = useAppStore((s) => s.caseQueue);
+  const caseQueueDemo = useAppStore((s) => s.caseQueueDemo);
 
   const urgent = caseQueue.filter((p) => p.redFlagLevel === "URGENT").length;
   const needsReview = caseQueue.filter((p) => p.redFlagLevel === "NEEDS_REVIEW").length;
@@ -32,16 +33,6 @@ export function DoctorHome() {
 
   return (
     <div className="pb-safe-nav">
-      {/* Hospital Hub link */}
-      <div className="mx-4 mt-3">
-        <button onClick={() => setView("HOSPITAL_HOME")}
-          className="flex w-full items-center gap-2 rounded-xl border border-border bg-card p-2.5 text-xs font-medium text-muted-foreground card-soft transition-colors hover:border-primary/40 hover:text-primary">
-          <Building2 className="size-4" />
-          Hospital / Reception Desk
-          <ChevronRight className="ml-auto size-3.5" />
-        </button>
-      </div>
-
       {/* AI clinical history link */}
       {useAppStore.getState().kioskSession?.summary && (
         <div className="mx-4 mt-2">
@@ -79,6 +70,13 @@ export function DoctorHome() {
       </header>
 
       <div className="px-4">
+        {/* Demo data notice */}
+        {caseQueueDemo && (
+          <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-300/50 bg-amber-50 p-2.5 text-xs text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <span>Showing demo patient queue. No real medical data.</span>
+          </div>
+        )}
         {/* Stats */}
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           <StatCard icon={Users} label="Patients Waiting" value={waiting} tone="bg-sky-500/10 text-sky-600" />
@@ -97,7 +95,10 @@ export function DoctorHome() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-semibold">Today&apos;s intake</p>
-                <p className="text-xs text-muted-foreground">{doctor?.facility ?? "Facility not set"} · {doctor?.specialization ?? "—"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {doctor?.workplace || doctor?.facility || "Workplace not set"}
+                  {doctor?.practiceType ? ` · ${doctor.practiceType}` : ""}
+                </p>
               </div>
               {queue.length > 0 ? (
                 <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-600">{queue.length} awaiting</span>

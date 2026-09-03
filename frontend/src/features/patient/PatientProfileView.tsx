@@ -4,7 +4,7 @@ import { Copy, Share2, QrCode, ShieldCheck, User, Phone, Droplets, BadgeCheck } 
 import { useAppStore } from "@/store";
 import { QRCodeSVG } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { InfoRow, SectionTitle } from "@/components/shared/primitive";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { useState } from "react";

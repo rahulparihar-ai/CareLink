@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, Send, Sparkles, LifeBuoy } from "lucide-react";
 import { useAppStore } from "@/store";
+import { useTranslation } from "@/i18n/useTranslation";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 interface Message {
   role: "user" | "ai";
@@ -15,74 +16,39 @@ interface Message {
 
 // Pre-written script that describes every part of the CareLink app. The
 // assistant answers purely from this script — it does not read any health
-// data because the user has not signed in yet.
-const APP_GUIDE: { keywords: string[]; answer: string }[] = [
-  {
-    keywords: ["register", "sign up", "signup", "patient", "hoshiyar", "abha", "account"],
-    answer:
-      "CareLink is a patient case-taking app. To get started, a patient enters their mobile number, verifies it with a 6-digit OTP, then registers by entering their name, basic health details and consent. Once registered, they get a private health record with a profile, timeline, documents and more.",
-  },
-  {
-    keywords: ["doctor", "login", "id", "password", "hospital"],
-    answer:
-      "Doctors sign in with the Doctor ID and password issued by their hospital — not by mobile OTP. First-time doctors complete a short registration (identity, hospital credentials, professional details, consent) before entering the doctor dashboard. There they can review patient cases, the priority queue and clinical notes.",
-  },
-  {
-    keywords: ["kiosk", "terminal", "machine", "self", "case-taking"],
-    answer:
-      "The MediKiosk is a self-service terminal in the hospital. A patient identifies themselves, gives consent, then answers a guided clinical-history questionnaire (voice, text or typing). Documents can be scanned/OCRed. The AI drafts a source-traceable clinical summary with red-flag alerts, which the doctor then verifies.",
-  },
-  {
-    keywords: ["timeline", "history", "record"],
-    answer:
-      "The Health Timeline shows a patient's visits, documents, medications, lab reports and vaccines in one scroll, grouped by year. Filters let you narrow by Visit, Document, Medication, Report or Vaccine.",
-  },
-  {
-    keywords: ["document", "scan", "ocr", "upload", "prescription", "report"],
-    answer:
-      "Patients can upload or scan prescription images, lab reports and discharge summaries. OCR reads the text and CareLink extracts fields like medicine name, dosage, date and the hospital, adding them to the health record.",
-  },
-  {
-    keywords: ["language", "translate", "hindi", "urdu", "english"],
-    answer:
-      "CareLink supports multiple languages including English, Hindi and Urdu. Urdu also switches the layout to right-to-left (RTL). You can change the language anytime from the Language screen on the welcome page.",
-  },
-  {
-    keywords: ["theme", "color", "accessibility", "dark", "change"],
-    answer:
-      "The Accessibility screen lets you pick a theme colour — White, Blue, Green, Pink, Golden Yellow or Black. The whole app updates instantly. You can reach it from the Accessibility button on the welcome page.",
-  },
-  {
-    keywords: ["ai", "assistant", "help", "guide", "what is", "does", "features", "works", "app"],
-    answer:
-      "I am the CareLink assistant. CareLink is an AI-assisted, source-traceable clinical history and case-taking app for hospitals and clinics. Its main parts are: Patient registration & profile, Doctor login with hospital-issued credentials, the MediKiosk self-service case-taking terminal, AI-drafted clinical summaries with red-flag detection, document OCR, a health timeline, language/accessibility themes and an ABDM/consent-ready design. Ask me about any of these and I'll explain them.",
-  },
-];
+// data because the user has not signed in yet. All copy is translated via
+// the i18n system so the Help Desk always follows the selected language.
+const TOPICS = ["register", "doctor", "kiosk", "timeline", "documents", "language", "theme", "ai"] as const;
 
-const SUGGESTIONS = [
-  "What does the app do?",
-  "How do patients register?",
-  "How does a doctor login?",
-  "What is the MediKiosk?",
-  "How does document scanning work?",
-];
+// English keyword set used to classify a free-typed question. Suggestion
+// buttons pass their topic directly. Answers are pulled from the current
+// language's translation dict (see t("help.answer.<topic>")).
+const KEYWORDS: Record<(typeof TOPICS)[number], string[]> = {
+  register: ["register", "sign up", "signup", "patient", "hoshiyar", "abha", "account"],
+  doctor: ["doctor", "login", "id", "password", "hospital"],
+  kiosk: ["kiosk", "terminal", "machine", "self", "case-taking"],
+  timeline: ["timeline", "history", "record"],
+  documents: ["document", "scan", "ocr", "upload", "prescription", "report"],
+  language: ["language", "translate", "hindi", "urdu", "english"],
+  theme: ["theme", "color", "accessibility", "dark", "change"],
+  ai: ["ai", "assistant", "help", "guide", "what is", "does", "features", "works", "app"],
+};
 
-const WELCOME =
-  "Hello! I'm the CareLink guide. I can explain how the app works — patient registration, doctor login, the MediKiosk, document scanning, the AI summary, languages and themes. Just ask me anything like \"What does the app do?\".";
-
-function scriptedReply(query: string): string {
+function topicForQuery(query: string): (typeof TOPICS)[number] {
   const q = query.toLowerCase();
-  for (const entry of APP_GUIDE) {
-    if (entry.keywords.some((k) => q.includes(k))) {
-      return entry.answer;
-    }
+  for (const topic of TOPICS) {
+    if (KEYWORDS[topic].some((k) => q.includes(k))) return topic;
   }
-  return APP_GUIDE[APP_GUIDE.length - 1].answer;
+  return "ai";
 }
+
+// Suggestion topic order matches the help.suggest.N keys 1..5.
+const SUGGESTION_TOPICS: (typeof TOPICS)[number][] = ["ai", "register", "doctor", "kiosk", "documents"];
 
 export function HelpAssistantView() {
   const setView = useAppStore((s) => s.setView);
-  const [messages, setMessages] = useState<Message[]>([{ role: "ai", text: WELCOME }]);
+  const { t } = useTranslation();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -97,12 +63,17 @@ export function HelpAssistantView() {
     return () => clearTimeout(timer);
   }, [typing]);
 
-  const send = (text: string) => {
+  // Renders the translated opening message. Because it is derived at render
+  // time (not stored in state), it always follows the selected language.
+  const welcome = t("help.welcome");
+
+  const send = (text: string, topicHint?: (typeof TOPICS)[number]) => {
     if (!text.trim()) return;
     setMessages((m) => [...m, { role: "user", text }]);
     setInput("");
     setTyping(true);
-    const answer = scriptedReply(text);
+    const topic = topicHint ?? topicForQuery(text);
+    const answer = t(`help.answer.${topic}`);
     setTimeout(() => {
       setMessages((m) => [...m, { role: "ai", text: answer }]);
     }, 700);
@@ -111,7 +82,7 @@ export function HelpAssistantView() {
   return (
     <div className="app-shell flex min-h-dvh flex-col bg-card">
       <div className="flex items-center p-4">
-        <Button variant="ghost" size="icon" onClick={() => setView("WELCOME")} aria-label="Back">
+        <Button variant="ghost" size="icon" onClick={() => setView("WELCOME")} aria-label={t("help.backAria")}>
           <ChevronLeft />
         </Button>
         <div className="mx-auto flex items-center gap-2">
@@ -126,15 +97,22 @@ export function HelpAssistantView() {
         </div>
         <div>
           <h1 className="flex items-center gap-1.5 text-xl font-bold">
-            Help Assistant <Sparkles className="size-4 text-primary" />
+            {t("help.title")} <Sparkles className="size-4 text-primary" />
           </h1>
           <p className="text-xs text-muted-foreground">
-            Tells you what every part of CareLink does
+            {t("help.subtitle")}
           </p>
         </div>
       </div>
 
       <div ref={scrollRef} className="h-[calc(100dvh-300px)] flex-1 space-y-3 overflow-y-auto px-4 pb-3">
+        {messages.length === 0 && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
+            <div className="max-w-[85%] rounded-2xl border border-border bg-card px-3.5 py-2.5 text-sm">
+              <p>{welcome}</p>
+            </div>
+          </motion.div>
+        )}
         {messages.map((m, i) => (
           <motion.div
             key={i}
@@ -170,17 +148,20 @@ export function HelpAssistantView() {
         )}
       </div>
 
-      {messages.length <= 1 && (
+      {messages.length === 0 && (
         <div className="mb-3 flex flex-wrap gap-1.5 px-4">
-          {SUGGESTIONS.map((s) => (
-            <button
-              key={s}
-              onClick={() => send(s)}
-              className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-            >
-              {s}
-            </button>
-          ))}
+          {SUGGESTION_TOPICS.map((topic, idx) => {
+            const label = t(`help.suggest.${idx + 1}`);
+            return (
+              <button
+                key={topic}
+                onClick={() => send(label, topic)}
+                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -190,7 +171,7 @@ export function HelpAssistantView() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send(input)}
-            placeholder="Ask how CareLink works…"
+            placeholder={t("help.inputPlaceholder")}
             className="w-full bg-transparent py-3 text-sm outline-none"
           />
         </div>

@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
-import { DoctorPageShell } from "@/components/shared/DoctorPageShell";
-import { cn } from "@/lib/utils";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
+import { cn } from "@/utils";
 
 export function DoctorClinicalView() {
   const setView = useAppStore((s) => s.setView);
@@ -65,7 +65,7 @@ export function DoctorClinicalView() {
             <ScrollText className="size-7" />
           </span>
           <p className="text-sm font-semibold">No clinical history yet</p>
-          <p className="text-xs text-muted-foreground">Patient history will appear here once captured via MediKiosk.</p>
+          <p className="text-xs text-muted-foreground">Patient history will appear here once captured via the Care Link kiosk.</p>
           <Button variant="outline" onClick={() => setView("DOCTOR_HOME")}>Back to Dashboard</Button>
         </div>
       ) : (

@@ -12,11 +12,11 @@ import {
   Check,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
-import { cn } from "@/lib/utils";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
+import { cn } from "@/utils";
 import type { ThemeName } from "@/types";
 import { Switch } from "@/components/shared/switch";
-import { SUPPORTED_LANGUAGES } from "@/lib/i18n/translations";
+import { SUPPORTED_LANGUAGES } from "@/i18n/translations";
 
 const themes: { key: ThemeName; label: string; swatch: string; isDark?: boolean }[] = [
   { key: "white", label: "White", swatch: "bg-white border border-black/10" },

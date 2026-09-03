@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { type KioskPhase } from "@/types";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { ScanLine, CheckCheck, FileDigit, MessageSquareText, LockKeyhole, IdCard } from "lucide-react";
 
 const STEPS: { key: KioskPhase; label: string; icon: React.ComponentType<{ className?: string }> }[] = [

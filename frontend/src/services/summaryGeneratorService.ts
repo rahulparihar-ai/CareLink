@@ -2,7 +2,7 @@ import type { ClinicalHistory, ConversationTurn, DocumentIntelligence, Physician
 import { uid } from "@/lib/brand/constants";
 
 // ------------------------------------------------------------------
-// MEDIKIOSK - Structured Clinical History Summary Generator
+// CARE LINK - Structured Clinical History Summary Generator
 // Synthesizes conversational history + digitized documents into a
 // single physician-ready clinical summary in standard format.
 // ------------------------------------------------------------------

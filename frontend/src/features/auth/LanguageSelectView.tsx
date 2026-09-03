@@ -4,16 +4,19 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useState } from "react";
 import { useAppStore } from "@/store";
-import { SUPPORTED_LANGUAGES } from "@/lib/i18n/translations";
+import { SUPPORTED_LANGUAGES } from "@/i18n/translations";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { LanguageCode } from "@/types";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 export function LanguageSelectView() {
   const setLanguage = useAppStore((s) => s.setLanguage);
   const setView = useAppStore((s) => s.setView);
   const current = useAppStore((s) => s.language);
+  const hasSeenStartupAssistant = useAppStore((s) => s.hasSeenStartupAssistant);
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<LanguageCode>(current);
 
   return (
@@ -22,9 +25,9 @@ export function LanguageSelectView() {
         <CareLinkLogo size="sm" />
       </div>
       <div className="px-6">
-        <h1 className="text-2xl font-bold">Choose your language</h1>
+        <h1 className="text-2xl font-bold">{t("lang.chooseTitle")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Select the language you are most comfortable with.
+          {t("lang.chooseSubtitle")}
         </p>
       </div>
 
@@ -67,10 +70,11 @@ export function LanguageSelectView() {
           size="lg"
           onClick={() => {
             setLanguage(selected);
-            setView("WELCOME");
+            // First run: introduce the startup AI assistant before the home screen.
+            setView(hasSeenStartupAssistant ? "WELCOME" : "AI_ASSISTANT");
           }}
         >
-          Continue
+          {t("lang.continue")}
         </Button>
       </div>
     </div>

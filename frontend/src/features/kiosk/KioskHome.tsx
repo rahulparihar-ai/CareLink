@@ -8,8 +8,8 @@ import {
 import { useAppStore } from "@/store";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
 import { Button } from "@/components/ui/button";
-import { SUPPORTED_LANGUAGES } from "@/lib/i18n/translations";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { SUPPORTED_LANGUAGES } from "@/i18n/translations";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export function KioskHome() {
   const setView = useAppStore((s) => s.setView);

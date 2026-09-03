@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
 import { useAppStore } from "@/store";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 export function PinLockScreen() {
   const pin = useAppStore((s) => s.pin);

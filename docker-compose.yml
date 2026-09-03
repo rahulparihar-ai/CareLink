@@ -1,0 +1,32 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    env_file: .env
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - database
+    environment:
+      DATABASE_URL: postgresql://carelink:carelink@database:5432/carelink
+
+  database:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: carelink
+      POSTGRES_PASSWORD: carelink
+      POSTGRES_DB: carelink
+    volumes:
+      - carelink-db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  carelink-db:

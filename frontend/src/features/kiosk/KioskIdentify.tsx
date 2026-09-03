@@ -10,8 +10,9 @@ import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CONSENT_SERVICE } from "@/services";
-import { cn } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { generatePatientId } from "@/lib/brand/constants";
+import { cn } from "@/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 
 type Method = "abha" | "aadhaar" | "new";
 
@@ -52,8 +53,8 @@ if (method === "abha") {
       const p = useAppStore.getState().patientProfile;
       setPatientProfile({ ...p!, name: newName.trim() });
     }
-    setRole("PATIENT");
-    setKioskPatientId("CL-2026-000124");
+setRole("PATIENT");
+    setKioskPatientId(generatePatientId());
     setView("KIOSK_CONSENT");
   };
 
@@ -107,7 +108,7 @@ if (method === "abha") {
                 <div className="flex flex-col items-center py-2">
                   <div className="flex size-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600"><CheckCircle2 className="size-8" /></div>
                   <p className="mt-2 text-sm font-semibold">{t("kiosk.qrVerified")}</p>
-                  <p className="text-xs text-muted-foreground">Rahul Sharma · 12/03/1992 · Male</p>
+                  <p className="text-xs text-muted-foreground">{t("kiosk.identityLinked")}</p>
                 </div>
               ) : (
                 <button onClick={handleContinue} disabled={loading}

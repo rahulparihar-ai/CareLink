@@ -1,26 +1,69 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ChevronLeft, Palette, Check } from "lucide-react";
+import { ChevronLeft, Accessibility, Mic, Eye, Sun, Moon, Languages } from "lucide-react";
 import { useAppStore } from "@/store";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { ThemeName } from "@/types";
+import { useTranslation } from "@/i18n/useTranslation";
+import { cn } from "@/utils";
 
-const themes: { key: ThemeName; label: string; swatch: string; isDark?: boolean }[] = [
-  { key: "white", label: "White", swatch: "bg-white border border-black/10" },
-  { key: "blue", label: "Blue", swatch: "bg-sky-500" },
-  { key: "green", label: "Green", swatch: "bg-emerald-500" },
-  { key: "pink", label: "Pink", swatch: "bg-pink-500" },
-  { key: "gold", label: "Golden Yellow", swatch: "bg-yellow-500" },
-  { key: "black", label: "Black", swatch: "bg-neutral-900", isDark: true },
-];
+function ToggleItem({
+  icon: Icon,
+  label,
+  desc,
+  checked,
+  onChange,
+}: {
+  icon: typeof Eye;
+  label: string;
+  desc: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-colors"
+      role="switch"
+      aria-checked={checked}
+    >
+      <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <Icon className="size-5" />
+      </div>
+      <div className="flex-1">
+        <p className="text-sm font-semibold">{label}</p>
+        <p className="text-xs text-muted-foreground">{desc}</p>
+      </div>
+      <span
+        className={cn(
+          "relative h-7 w-12 shrink-0 rounded-full transition-colors",
+          checked ? "bg-primary" : "bg-muted"
+        )}
+      >
+        <span
+          className={cn(
+            "absolute top-0.5 size-6 rounded-full bg-white shadow transition-all",
+            checked ? "left-[22px]" : "left-0.5"
+          )}
+        />
+      </span>
+    </button>
+  );
+}
 
 export function AccessibilityView() {
-  const themeColor = useAppStore((s) => s.themeColor);
-  const setThemeColor = useAppStore((s) => s.setThemeColor);
+  const { t } = useTranslation();
   const setView = useAppStore((s) => s.setView);
+  const largeText = useAppStore((s) => s.largeText);
+  const setLargeText = useAppStore((s) => s.setLargeText);
+  const highContrast = useAppStore((s) => s.highContrast);
+  const setHighContrast = useAppStore((s) => s.setHighContrast);
+  const reducedMotion = useAppStore((s) => s.reducedMotion);
+  const setReducedMotion = useAppStore((s) => s.setReducedMotion);
+  const audioGuided = useAppStore((s) => s.audioGuided);
+  const setAudioGuided = useAppStore((s) => s.setAudioGuided);
 
   return (
     <div className="app-shell flex min-h-dvh flex-col bg-card">
@@ -40,51 +83,60 @@ export function AccessibilityView() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <Palette className="size-7" />
+            <Accessibility className="size-7" />
           </div>
-          <h1 className="mt-4 text-2xl font-bold">Accessibility</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Pick a theme. The whole app updates instantly.
-          </p>
+          <h1 className="mt-4 text-2xl font-bold">{t("auth.accessibility")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("a11y.accessibilityHint")}</p>
         </motion.div>
       </div>
 
-      <div className="mt-6 flex-1 px-6">
-        <div className="grid grid-cols-3 gap-3">
-          {themes.map((th, i) => (
-            <motion.button
-              key={th.key}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04 }}
-              onClick={() => setThemeColor(th.key)}
-              className={cn(
-                "flex flex-col items-center gap-2 rounded-2xl border p-4 transition-all",
-                themeColor === th.key ? "border-primary bg-primary/5" : "border-border"
-              )}
-            >
-              <span
-                className={cn(
-                  "relative flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-black/5",
-                  th.swatch
-                )}
-              >
-                {themeColor === th.key && (
-                  <Check
-                    className={cn("size-5", th.isDark ? "text-black" : "text-white")}
-                    strokeWidth={3}
-                  />
-                )}
-              </span>
-              <span className="text-[11px] font-medium">{th.label}</span>
-            </motion.button>
-          ))}
-        </div>
+      <div className="mt-6 space-y-3 px-6">
+        <ToggleItem
+          icon={Mic}
+          label={t("a11y.audioGuided")}
+          desc={t("a11y.audioGuidedHint")}
+          checked={audioGuided}
+          onChange={setAudioGuided}
+        />
+        <ToggleItem
+          icon={Eye}
+          label={t("a11y.largeText")}
+          desc={t("a11y.largeTextHint")}
+          checked={largeText}
+          onChange={setLargeText}
+        />
+        <ToggleItem
+          icon={Sun}
+          label={t("a11y.highContrast")}
+          desc={t("a11y.highContrastHint")}
+          checked={highContrast}
+          onChange={setHighContrast}
+        />
+        <ToggleItem
+          icon={Moon}
+          label={t("settings.reducedMotion")}
+          desc={t("a11y.reducedMotionHint")}
+          checked={reducedMotion}
+          onChange={setReducedMotion}
+        />
+
+        <button
+          onClick={() => setView("THEME")}
+          className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition-colors"
+        >
+          <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Languages className="size-5" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">{t("a11y.theme")}</p>
+            <p className="text-xs text-muted-foreground">{t("a11y.themeHint")}</p>
+          </div>
+        </button>
       </div>
 
-      <div className="p-6 pb-safe">
+      <div className="mt-auto p-6 pb-safe">
         <Button onClick={() => setView("WELCOME")} size="lg" className="h-14 w-full text-base">
-          Done
+          {t("common.done")}
         </Button>
       </div>
     </div>

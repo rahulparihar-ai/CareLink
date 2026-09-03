@@ -8,14 +8,17 @@ import { useAppStore } from "@/store";
 export function SplashView() {
   const setView = useAppStore((s) => s.setView);
   const setHasSeenSplash = useAppStore((s) => s.setHasSeenSplash);
+  const hasSeenStartupAssistant = useAppStore((s) => s.hasSeenStartupAssistant);
 
   useEffect(() => {
     const t = setTimeout(() => {
       setHasSeenSplash(true);
-      setView("WELCOME");
+      // First run goes straight to language selection, which leads into the
+      // startup AI assistant. Returning users skip onboarding straight to home.
+      setView(hasSeenStartupAssistant ? "WELCOME" : "LANGUAGE");
     }, 3400);
     return () => clearTimeout(t);
-  }, [setHasSeenSplash, setView]);
+  }, [setHasSeenSplash, setView, hasSeenStartupAssistant]);
 
   return (
     <div className="app-shell relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-card">

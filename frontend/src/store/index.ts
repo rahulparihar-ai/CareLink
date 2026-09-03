@@ -38,7 +38,6 @@ import type {
   PhysicianSummary,
   DoctorPatientRecord,
 } from "@/types";
-import { demoDoctors } from "@/data/demo";
 
 // ---- View names ----
 export type View =
@@ -52,7 +51,9 @@ export type View =
   | "REGISTER"
   | "DOCTOR_REGISTER"
   | "ACCESSIBILITY"
+  | "THEME"
   | "HELP"
+  | "AI_ASSISTANT"
   | "PATIENT_HOME"
   | "PATIENT_PROFILE"
   | "PATIENT_SETTINGS"
@@ -67,7 +68,6 @@ export type View =
   | "PATIENT_INSURANCE"
   | "PATIENT_VACCINATION"
   | "PATIENT_APPOINTMENTS"
-  | "PATIENT_BOOK_APPOINTMENT"
   | "PATIENT_AI"
   | "PATIENT_INTAKE"
   | "PATIENT_WELLNESS"
@@ -86,18 +86,13 @@ export type View =
   | "DOCTOR_NOTES"
   | "DOCTOR_PRESCRIPTIONS"
   | "DOCTOR_FOLLOWUPS"
+  | "DOCTOR_CONSULTATION"
   | "HOSPITAL_HOME"
-  | "CONSULTANT_SCHEDULE"
-  | "CONSULTANT_DETAIL"
-  | "TARIFF"
-  | "ROSTER"
   | "REGISTER_PATIENT"
-  | "AADHAAR_SCAN"
   | "LAB_REPORTS"
   | "SCAN_PRESCRIPTION"
-  | "DOCTOR_DESK"
 
-  // MediKiosk views
+  // Care Link kiosk views
   | "KIOSK_HOME"
   | "KIOSK_IDENTIFY"
   | "KIOSK_CONSENT"
@@ -127,15 +122,25 @@ interface AppState {
   setHighContrast: (b: boolean) => void;
   largeText: boolean;
   setLargeText: (b: boolean) => void;
+  audioGuided: boolean;
+  setAudioGuided: (b: boolean) => void;
 
   // auth
   hasSeenSplash: boolean;
   setHasSeenSplash: (b: boolean) => void;
+  hasSeenStartupAssistant: boolean;
+  setHasSeenStartupAssistant: (b: boolean) => void;
   loginMobile: string;
   setLoginMobile: (m: string) => void;
   loginDoctorId: string;
   setLoginDoctorId: (id: string) => void;
   logout: () => void;
+
+  // Aadhaar linking (UI flow, no live verification)
+  aadhaarReference: string;
+  setAadhaarReference: (r: string) => void;
+  aadhaarVerified: boolean;
+  setAadhaarVerified: (b: boolean) => void;
 
   // profiles
   patientProfile: PatientProfile | null;
@@ -201,7 +206,7 @@ interface AppState {
   addAuditEvent: (e: AuditEvent) => void;
   resetApp: () => void;
 
-  // MediKiosk
+  // Care Link kiosk
   kioskSession: KioskSession | null;
   startKioskSession: (partial: Partial<KioskSession>) => void;
   setKioskPhase: (phase: KioskPhase) => void;
@@ -221,6 +226,11 @@ interface AppState {
   caseQueue: DoctorPatientRecord[];
   addCompletedCase: (c: DoctorPatientRecord) => void;
   updateCaseStatus: (id: string, status: DoctorPatientRecord["status"]) => void;
+  updateCaseRecord: (id: string, patch: Partial<DoctorPatientRecord>) => void;
+  // The case queue is real data only. env:DOCTOR_DEMO_CASES gates synthetic
+  // seed data to development; it never renders in the normal production UI.
+  caseQueueDemo: boolean;
+  seedDemoCases: () => void;
 }
 
 const now = () => new Date().toISOString();
@@ -245,19 +255,29 @@ export const useAppStore = create<AppState>()(
       setHighContrast: (b) => set({ highContrast: b }),
       largeText: false,
       setLargeText: (b) => set({ largeText: b }),
+      audioGuided: false,
+      setAudioGuided: (b) => set({ audioGuided: b }),
 
       hasSeenSplash: false,
       setHasSeenSplash: (b) => set({ hasSeenSplash: b }),
+      hasSeenStartupAssistant: false,
+      setHasSeenStartupAssistant: (b) => set({ hasSeenStartupAssistant: b }),
       loginMobile: "",
       setLoginMobile: (m) => set({ loginMobile: m }),
       loginDoctorId: "",
       setLoginDoctorId: (id) => set({ loginDoctorId: id }),
+      aadhaarReference: "",
+      setAadhaarReference: (r) => set({ aadhaarReference: r }),
+      aadhaarVerified: false,
+      setAadhaarVerified: (b) => set({ aadhaarVerified: b }),
       logout: () =>
         set({
-          currentView: "LOGIN",
+          currentView: "WELCOME",
           role: null,
           loginMobile: "",
           loginDoctorId: "",
+          aadhaarReference: "",
+          aadhaarVerified: false,
           selectedPatientId: null,
           isUnlocked: true,
         }),
@@ -354,7 +374,7 @@ export const useAppStore = create<AppState>()(
           selectedPatientId: null,
         }),
 
-      // MediKiosk
+      // Care Link kiosk
       kioskSession: null,
       startKioskSession: (partial) =>
         set((s) => {
@@ -423,6 +443,18 @@ export const useAppStore = create<AppState>()(
         set((s) => ({
           caseQueue: s.caseQueue.map((c) => (c.id === id ? { ...c, status } : c)),
         })),
+      // Generic patch for a case record (notes, prescriptions, red flags,
+      // summary verification etc.). Persists doctor actions into the record.
+      updateCaseRecord: (id, patch) =>
+        set((s) => ({
+          caseQueue: s.caseQueue.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+        })),
+      // Real patient cases captured through the kiosk/case-taking flow. The
+      // The doctor queue is never pre-seeded in production or in demo.
+      // No fabricated patient records are ever injected; the portal starts
+      // empty and waits for real patient intake.
+      caseQueueDemo: false,
+      seedDemoCases: () => set({}),
     }),
     {
       name: BRAND.storageKey,
@@ -433,9 +465,13 @@ export const useAppStore = create<AppState>()(
         reducedMotion: s.reducedMotion,
         highContrast: s.highContrast,
         largeText: s.largeText,
+        audioGuided: s.audioGuided,
         hasSeenSplash: s.hasSeenSplash,
+        hasSeenStartupAssistant: s.hasSeenStartupAssistant,
         role: s.role,
         loginMobile: s.loginMobile,
+        aadhaarReference: s.aadhaarReference,
+        aadhaarVerified: s.aadhaarVerified,
         patientProfile: s.patientProfile,
         doctorProfile: s.doctorProfile,
         medications: s.medications,
@@ -455,11 +491,9 @@ export const useAppStore = create<AppState>()(
         isUnlocked: s.isUnlocked,
         kioskSession: s.kioskSession,
         caseQueue: s.caseQueue,
+        caseQueueDemo: s.caseQueueDemo,
         auditTrail: s.auditTrail,
       }),
     }
   )
 );
-
-// Convenience: get demo doctors
-export { demoDoctors };

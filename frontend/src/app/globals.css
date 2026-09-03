@@ -466,3 +466,33 @@ html {
     transparent 70%
   );
 }
+
+/* ---- Accessibility modifiers (applied on .app-shell) ---- */
+
+/* Large text: bump the base font size so all app-shell text scales up */
+.ck-large-text {
+  font-size: 1.125rem;
+}
+.ck-large-text button,
+.ck-large-text input,
+.ck-large-text select,
+.ck-large-text textarea {
+  font-size: 1.0625rem;
+}
+
+/* High contrast: strengthen borders, shadows and reduce soft backgrounds */
+.ck-high-contrast {
+  --border: hsl(var(--foreground));
+  border-color: var(--foreground) !important;
+}
+.ck-high-contrast .app-shell * {
+  box-shadow: none;
+}
+
+/* Reduced motion: tame framer-motion transitions at the CSS layer */
+.ck-reduced-motion,
+.ck-reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

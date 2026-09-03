@@ -12,9 +12,9 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import { runOcrPipeline, ocrSteps, type OcrStep } from "@/services/ocrService";
 import { uid } from "@/lib/brand/constants";
 
@@ -114,7 +114,7 @@ export function PatientOcrView() {
             onClick={startScan}
             className="mt-4 text-sm font-medium text-primary"
           >
-            Use a demo document instead
+            Use a sample document to preview extraction
           </button>
         </div>
       )}

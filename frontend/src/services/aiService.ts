@@ -1,54 +1,83 @@
 // ------------------------------------------------------------------
-// CARELINK - Mock AI Assistant Service
-// Frontend simulation. Outputs are static/demo.
+// CARELINK - AI Health Assistant Service (client mock)
+// Answers from the user's ACTUAL stored records passed in by the caller.
+// It never fabricates personal or medical data; when no record exists it
+// returns honest, neutral guidance.
 // ------------------------------------------------------------------
 
 export interface AiReply {
   text: string;
-  patterns?: { label: string; evidence: string[] }[];
   sources?: { label: string; value: string; sourceType: string; confidence?: number }[];
 }
 
-const answers: Record<string, string> = {
-  medication: "Currently in your record: Amlodipine 5 mg once daily and Metformin 500 mg twice daily.",
-  appointment: "Your most recent appointment was with Dr. Mehta on 5 March 2026, and your next one is on 30 August 2026 at 10:30 AM.",
-  lab: "Your last lab report is a Complete Blood Count from 18 Aug 2026. Hb 12.4 g/dL, WBC 7.2 ×10⁹/L, Platelets 245 ×10⁹/L — all within normal range.",
-  blood: "Your recorded blood group is B+.",
-  allergy: "Your record lists a known allergy to Penicillin (moderate severity).",
-  term: "A 'CBC' (Complete Blood Count) measures red cells, white cells and platelets. It is a common screening test. For a full explanation, please discuss with your doctor.",
-};
+export interface AiRecordContext {
+  medications: string[];
+  appointments: { doctor: string; date: string; time: string }[];
+  lastLab: { title: string; date: string; status: string } | null;
+  bloodGroup: string;
+  allergies: string[];
+}
 
-export async function askAi(query: string): Promise<AiReply> {
+const noRecords = (missing: string) =>
+  `I don't have any ${missing} stored in your profile yet. Add it from the app, and I'll be able to answer about it.`;
+
+export async function askAi(query: string, ctx: AiRecordContext): Promise<AiReply> {
   await delay(700);
   const q = query.toLowerCase();
-  const qa: Record<string, string> = {
-    "medication": "medication",
-    "medicine": "medication",
-    "take": "medication",
-    "appointment": "appointment",
-    "last visit": "appointment",
-    "lab": "lab",
-    "report": "lab",
-    "blood": "blood",
-    "allerg": "allergy",
-    "term": "term",
-    "meaning": "term",
-  };
-  let reply = "That's a general health question. I can help with your stored records. Here is some general guidance — please confirm with your doctor for any decisions. Your records show an allergy to Penicillin and medications Amlodipine and Metformin.";
-  const patterns: AiReply["patterns"] = [
-    { label: "Historical pattern: seasonal flu visits", evidence: ["Visits in Oct 2025, Oct 2024"] },
-  ];
-  const sources: AiReply["sources"] = [
-    { label: "Medication list", value: "Amlodipine 5mg, Metformin 500mg", sourceType: "clinical record", confidence: 0.99 },
-  ];
 
-  for (const [kw, key] of Object.entries(qa)) {
-    if (q.includes(kw)) {
-      reply = answers[key];
-      break;
-    }
+  if (q.includes("medication") || q.includes("medicine") || q.includes("take") || q.includes("prescription")) {
+    return {
+      text: ctx.medications.length
+        ? `Currently in your record: ${ctx.medications.join(", ")}.`
+        : noRecords("medications"),
+      sources: ctx.medications.length
+        ? [{ label: "Medication list", value: ctx.medications.join(", "), sourceType: "clinical record" }]
+        : undefined,
+    };
   }
-  return { text: reply, patterns, sources };
+
+  if (q.includes("appointment") || q.includes("last visit") || q.includes("visit")) {
+    return {
+      text: ctx.appointments.length
+        ? `Your ${ctx.appointments.length === 1 ? "appointment is" : "appointments are"}: ${ctx.appointments
+            .map((a) => `${a.doctor} on ${a.date} at ${a.time}`)
+            .join("; ")}.`
+        : noRecords("appointments"),
+      sources: ctx.appointments.length
+        ? [{ label: "Appointments", value: ctx.appointments.map((a) => a.doctor).join(", "), sourceType: "clinical record" }]
+        : undefined,
+    };
+  }
+
+  if (q.includes("lab") || q.includes("report")) {
+    return {
+      text: ctx.lastLab
+        ? `Your latest lab record is "${ctx.lastLab.title}" from ${ctx.lastLab.date} (${ctx.lastLab.status}).`
+        : noRecords("lab reports"),
+      sources: ctx.lastLab
+        ? [{ label: "Lab report", value: ctx.lastLab.title, sourceType: "document" }]
+        : undefined,
+    };
+  }
+
+  if (q.includes("blood")) {
+    return {
+      text: ctx.bloodGroup ? `Your recorded blood group is ${ctx.bloodGroup}.` : noRecords("blood group"),
+    };
+  }
+
+  if (q.includes("allerg")) {
+    return {
+      text: ctx.allergies.length
+        ? `Your record lists the following allergies: ${ctx.allergies.join(", ")}.`
+        : noRecords("allergies"),
+    };
+  }
+
+  // Generic fallback — general guidance only, no assumptions about records.
+  return {
+    text: "I can help with the information stored in your CareLink profile — such as your medications, lab reports, appointments, blood group and allergies. Since the app currently shows only what you have stored, if you don't see a result it means nothing has been recorded yet. Please confirm any decision with your doctor.",
+  };
 }
 
 export function delay(ms: number) {

@@ -2,7 +2,7 @@
 
 import { Footprints, Moon, Sparkles, Salad, ChevronRight } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
 
 export function PatientWellnessView() {
   const setView = useAppStore((s) => s.setView);

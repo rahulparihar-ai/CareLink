@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CareLink — Frontend
 
-## Getting Started
+Multilingual (13 languages, includes RTL Urdu), themeable patient + doctor health platform with an AI assistant layer. Built on Next.js App Router + TypeScript + Zustand.
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev       # development server
+npm run build     # production build
+npm run lint      # eslint
+npm test          # vitest (routing, i18n parity, AI config/actions/gateway)
+npx tsc --noEmit  # type check
+```
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/          # Next.js App Router entry (layout, page switch, globals, api routes)
+├── components/   # shared UI (brand/, shared/, ui/)
+├── features/     # feature view modules (auth/, patient/, doctor/, hospital/, kiosk/, ai/, splash)
+├── hooks/        # shared React hooks (useAiAssistant)
+├── layouts/      # page shells + navigation (PatientPageShell, DoctorPageShell, BottomNav, ...)
+├── i18n/         # 13-language translations + useTranslation + parity test
+├── lib/          # framework-agnostic core (ai/, brand/)
+├── routes/       # role-gated routing (routing.ts)
+├── services/     # mock service adapters (auth, AI gateway, OCR, ...)
+├── store/        # Zustand store (single source of truth)
+├── themes/       # theme provider (ThemeProvider)
+├── utils/        # shared utilities (cn, toneBg)
+├── types/        # shared TypeScript contracts
+└── data/         # reference option lists (professions, orgs) + demo.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Conventions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **REUSE > EXTEND > CREATE** — do not rewrite or delete working features.
+- No fabricated patient or personal medical data on production surfaces; show empty states when the backend is unavailable.
+- Secret env vars are server-side only — never `NEXT_PUBLIC_*` for AI/DB keys.

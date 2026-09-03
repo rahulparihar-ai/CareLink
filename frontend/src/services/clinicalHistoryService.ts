@@ -10,7 +10,7 @@ import { uid } from "@/lib/brand/constants";
 type AyushRecord = Partial<import("@/types").AyushHistory>;
 
 // ------------------------------------------------------------------
-// MEDIKIOSK - Conversational Clinical History Engine
+// CARE LINK - Conversational Clinical History Engine
 // Simulates an adaptive AI that conducts a structured history interview
 // following the SOCRATES framework and medical history ontology.
 // ------------------------------------------------------------------
@@ -293,6 +293,8 @@ export const HISTORY_SERVICE = {
 
   async transcribeVoice(): Promise<string> {
     await delay(1500);
-    return "I have had chest pain for the past three days. It feels heavy and pressing, sometimes it spreads to my left arm. It gets worse when I walk or climb stairs and feels better when I rest.";
+    // Mock voice transcription. Returns no prefabricated patient utterance;
+    // real STT (Web Speech / Bhashini) would supply the actual spoken text.
+    return "";
   },
 };

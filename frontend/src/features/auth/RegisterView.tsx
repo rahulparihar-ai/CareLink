@@ -8,8 +8,8 @@ import { generatePatientId } from "@/lib/brand/constants";
 import { validateMobile } from "@/services/authService";
 import { Button } from "@/components/ui/button";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
-import { getLanguageDir } from "@/lib/i18n/translations";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { getLanguageDir } from "@/i18n/translations";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { RegistrationMode } from "@/types";
 
 const STEPS = [
@@ -17,6 +17,7 @@ const STEPS = [
   { key: "identity" },
   { key: "profile" },
   { key: "consent" },
+  { key: "account" },
   { key: "complete" },
 ] as const;
 
@@ -29,6 +30,8 @@ export function RegisterView() {
   const setPatientProfile = useAppStore((s) => s.setPatientProfile);
   const language = useAppStore((s) => s.language);
   const addAuditEvent = useAppStore((s) => s.addAuditEvent);
+  const aadhaarVerified = useAppStore((s) => s.aadhaarVerified);
+  const aadhaarReference = useAppStore((s) => s.aadhaarReference);
 
   const [step, setStep] = useState<StepKey>("identity");
   const [mode, setMode] = useState<RegistrationMode>("self");
@@ -39,6 +42,9 @@ export function RegisterView() {
     name: "",
     age: "",
     gender: "Male",
+    dob: "",
+    email: "",
+    address: "",
     bloodGroup: "",
     emergencyName: "",
     emergencyPhone: "",
@@ -51,6 +57,9 @@ export function RegisterView() {
   const [shareRecords, setShareRecords] = useState(true);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [consentError, setConsentError] = useState("");
+
+  const [account, setAccount] = useState({ password: "", confirm: "" });
+  const setAcc = (k: keyof typeof account, v: string) => setAccount((a) => ({ ...a, [k]: v }));
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -72,16 +81,32 @@ export function RegisterView() {
         return;
       }
     }
-    if (step === "identity" && !form.name.trim()) {
-      setConsentError(t("onb.nameRequired"));
-      return;
+    if (step === "identity") {
+      const missing: string[] = [];
+      if (!form.name.trim()) missing.push("name");
+      if (!form.dob.trim()) missing.push("dob");
+      if (!form.gender.trim()) missing.push("gender");
+      if (!form.email.trim()) missing.push("email");
+      if (!form.address.trim()) missing.push("address");
+      if (missing.length > 0) {
+        setConsentError(t("onb.completeRequired"));
+        return;
+      }
     }
     setConsentError("");
     if (step === "consent" && !termsAccepted) {
       setConsentError(t("onb.consent.requireCheck"));
       return;
     }
-    if (step === "consent") {
+    if (step === "account") {
+      if (!account.password || account.password.length < 6) {
+        setConsentError(t("dreg.account.passShort"));
+        return;
+      }
+      if (account.password !== account.confirm) {
+        setConsentError(t("dreg.account.passMismatch"));
+        return;
+      }
       finalizeProfile();
       return;
     }
@@ -93,17 +118,27 @@ export function RegisterView() {
   const finalizeProfile = () => {
     const name = form.name.trim();
     const patientId = generatePatientId();
+    const dob = form.dob.trim();
+    const ageFromDob = dob
+      ? Math.max(0, Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000)))
+      : Number(form.age) || 0;
     setPatientProfile({
       id: patientId,
       name,
-      age: Number(form.age) || 0,
+      age: ageFromDob,
       gender: form.gender,
+      dateOfBirth: dob || undefined,
+      email: form.email.trim() || undefined,
+      address: form.address.trim() || undefined,
       mobileNumber: form.mobile.trim() || loginMobile,
+      password: account.password || undefined,
       language: language,
       emergencyContact: form.emergencyName
         ? `${form.emergencyName}${form.emergencyPhone ? ` · ${form.emergencyPhone}` : ""}`
         : undefined,
-      abhaStatus: abhaLink ? "Linked" : "Not Linked",
+      abhaStatus: abhaLink || aadhaarVerified ? "Linked" : "Not Linked",
+      abhaReference: aadhaarReference || undefined,
+      aadhaarVerified: abhaLink || aadhaarVerified ? true : undefined,
       bloodGroup: form.bloodGroup || undefined,
       allergies: form.allergies || undefined,
       currentMedicines: form.currentMeds || undefined,
@@ -234,12 +269,12 @@ export function RegisterView() {
                 <div className="mt-6 space-y-4">
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      {isProxy ? t("onb.proxy.patientName") : t("onb.name")}
+                      {isProxy ? t("onb.proxy.patientName") : t("onb.name")} <span className="text-destructive">*</span>
                     </label>
                     <input
                       value={form.name}
                       onChange={(e) => set("name", e.target.value)}
-                      placeholder="Rahul Sharma"
+                      placeholder="Your full name"
                       className={inputCls}
                     />
                   </div>
@@ -260,6 +295,19 @@ export function RegisterView() {
                     </div>
                   )}
 
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium">
+                      {isProxy ? t("onb.proxy.dob") : t("onb.dob")} <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={form.dob}
+                      onChange={(e) => set("dob", e.target.value)}
+                      max={new Date().toISOString().slice(0, 10)}
+                      className={inputCls}
+                    />
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
@@ -275,7 +323,7 @@ export function RegisterView() {
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">
-                        {isProxy ? t("onb.proxy.gender") : t("onb.gender")}
+                        {isProxy ? t("onb.proxy.gender") : t("onb.gender")} <span className="text-destructive">*</span>
                       </label>
                       <select
                         value={form.gender}
@@ -287,6 +335,33 @@ export function RegisterView() {
                         <option>Other</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium">
+                      {t("onb.email")} <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => set("email", e.target.value)}
+                      placeholder="name@example.com"
+                      autoComplete="email"
+                      className={inputCls}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium">
+                      {t("onb.address")} <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      value={form.address}
+                      onChange={(e) => set("address", e.target.value)}
+                      placeholder={t("onb.addressPlaceholder")}
+                      autoComplete="street-address"
+                      className={inputCls}
+                    />
                   </div>
                 </div>
               </div>
@@ -359,7 +434,7 @@ export function RegisterView() {
                       <input
                         value={form.emergencyName}
                         onChange={(e) => set("emergencyName", e.target.value)}
-                        placeholder="Priya Sharma"
+                        placeholder="Emergency contact name"
                         className={inputCls}
                       />
                     </div>
@@ -393,7 +468,7 @@ export function RegisterView() {
                     <input
                       value={form.currentMeds}
                       onChange={(e) => set("currentMeds", e.target.value)}
-                      placeholder="Amlodipine 5mg"
+                      placeholder="e.g. Medicine 50mg"
                       className={inputCls}
                     />
                   </div>
@@ -461,6 +536,37 @@ export function RegisterView() {
               </div>
             )}
 
+            {step === "account" && (
+              <div>
+                <h1 className="text-2xl font-bold">{t("dreg.account.title")}</h1>
+                <p className="mt-1 text-sm text-muted-foreground">{t("dreg.account.subtitle")}</p>
+
+                <div className="mt-5 space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium">{t("dreg.account.password")}</label>
+                    <input
+                      type="password"
+                      value={account.password}
+                      onChange={(e) => { setAcc("password", e.target.value); setConsentError(""); }}
+                      placeholder="••••••••"
+                      className={inputCls}
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium">{t("dreg.account.confirm")}</label>
+                    <input
+                      type="password"
+                      value={account.confirm}
+                      onChange={(e) => { setAcc("confirm", e.target.value); setConsentError(""); }}
+                      placeholder="••••••••"
+                      className={inputCls}
+                    />
+                  </div>
+                  {consentError && <p className="text-sm text-destructive">{consentError}</p>}
+                </div>
+              </div>
+            )}
+
             {step === "complete" && (
               <div className="flex flex-col items-center pt-6 text-center">
                 <motion.div
@@ -506,7 +612,7 @@ export function RegisterView() {
       <div className="border-t border-border p-4 pb-safe">
         {step !== "complete" ? (
           <Button onClick={goNext} size="lg" className="h-14 w-full text-base">
-            {step === "consent" ? t("onb.create") : step === "identity" ? t("auth.continue") : t("onb.next")}{" "}
+            {step === "account" ? t("onb.create") : step === "identity" ? t("auth.continue") : t("onb.next")}{" "}
             <ChevronRight className="ml-1.5" />
           </Button>
         ) : (

@@ -2,7 +2,7 @@ import type { ConsentRecord, LanguageCode } from "@/types";
 import { uid } from "@/lib/brand/constants";
 
 // ------------------------------------------------------------------
-// MEDIKIOSK - Consent, Privacy & ABDM Integration
+// CARE LINK - Consent, Privacy & ABDM Integration
 // Models the ABDM consent framework + DPDP Act 2023 compliance.
 // Consent is granular, revocable, and audio-guided for low-literacy users.
 // ------------------------------------------------------------------
@@ -111,23 +111,21 @@ export const CONSENT_SERVICE = {
     if (!abhaId || abhaId.length < 8) {
       return { ok: false, error: "Please enter a valid ABHA ID (min 8 characters)." };
     }
+    // Simulated success. No fabricated patient identity is returned; profile
+    // data comes from the record the user has already provided.
     return {
       ok: true,
-      name: "Rahul Sharma", // simulated
     };
   },
 
   /** Simulate Aadhaar QR decode */
   async decodeAadhaarQr(): Promise<{ ok: boolean; profile?: Partial<{ name: string; dob: string; gender: string; aadhaarLast4: string }>; error?: string }> {
     await delay(1500);
+    // Simulated scan success. No name/DOB/gender or Aadhaar digits are
+    // fabricated — a linked identity is confirmed without inventing a person.
     return {
       ok: true,
-      profile: {
-        name: "Rahul Sharma",
-        dob: "12/03/1992",
-        gender: "Male",
-        aadhaarLast4: "4821",
-      },
+      profile: {},
     };
   },
 

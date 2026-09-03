@@ -10,8 +10,8 @@ import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { KioskProgress } from "./KioskProgress";
 import { HISTORY_SERVICE, type HistoryQuestion } from "@/services";
-import { cn } from "@/lib/utils";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { cn } from "@/utils";
+import { useTranslation } from "@/i18n/useTranslation";
 import type { ConversationTurn, HistoryQuestionCategory } from "@/types";
 
 interface AnswerMap {

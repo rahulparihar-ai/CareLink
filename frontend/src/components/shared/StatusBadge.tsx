@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 type Variant = "default" | "success" | "warning" | "danger" | "muted" | "info" | "gold";
 

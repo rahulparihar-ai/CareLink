@@ -32,13 +32,13 @@ export interface OcrResult {
 }
 
 const demoFields: OcrExtractedField[] = [
-  { id: "f1", label: "Patient Name", value: "Rahul Sharma", confidence: 0.98, needsVerification: false },
-  { id: "f2", label: "Date", value: "18 Aug 2026", confidence: 0.95, needsVerification: false },
-  { id: "f3", label: "Test", value: "Complete Blood Count (CBC)", confidence: 0.99, needsVerification: false },
-  { id: "f4", label: "Hb", value: "12.4 g/dL", confidence: 0.93, needsVerification: false },
-  { id: "f5", label: "WBC", value: "7.2 ×10⁹/L", confidence: 0.9, needsVerification: false },
-  { id: "f6", label: "Platelets", value: "245 ×10⁹/L", confidence: 0.89, needsVerification: false },
-  { id: "f7", label: "Doctor Ref", value: "Dr. Arjun Mehta", confidence: 0.82, needsVerification: true },
+  { id: "f1", label: "Patient Name", value: "— (from scanned document)", confidence: 0.98, needsVerification: true },
+  { id: "f2", label: "Date", value: "—", confidence: 0.95, needsVerification: true },
+  { id: "f3", label: "Test / Document type", value: "—", confidence: 0.99, needsVerification: true },
+  { id: "f4", label: "Field 1", value: "— (extracted value)", confidence: 0.93, needsVerification: true },
+  { id: "f5", label: "Field 2", value: "— (extracted value)", confidence: 0.9, needsVerification: true },
+  { id: "f6", label: "Field 3", value: "— (extracted value)", confidence: 0.89, needsVerification: true },
+  { id: "f7", label: "Provider / Reference", value: "—", confidence: 0.82, needsVerification: true },
 ];
 
 export const ocrSteps: OcrStep[] = [
@@ -57,13 +57,13 @@ export async function runOcrPipeline(): Promise<OcrResult> {
   // organising
   await delay(600);
   return {
-    title: "Complete Blood Count",
-    docType: "Lab Report",
-    date: "18 Aug 2026",
-    hospital: "CareLink Lab",
+    title: "Scanned Document",
+    docType: "Report",
+    date: "—",
+    hospital: "CareLink",
     fields: demoFields,
     rawText:
-      "Complete Blood Count\nPatient: Rahul Sharma   Age: 34\nHb 12.4 g/dL\nWBC 7.2 x10^9/L\nPlatelets 245 x10^9/L\nRef: Dr. Arjun Mehta",
+      "OCR pipeline output. Fields are placeholders — a scanned document would provide the actual patient, date, provider and values. Backend capable of real OCR is not wired yet.",
     confidenceOverall: 0.92,
     source: "OCR",
   };

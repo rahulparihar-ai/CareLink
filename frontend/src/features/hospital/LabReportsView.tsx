@@ -4,44 +4,29 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FlaskConical, TrendingUp } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
 import { EmptyState } from "@/components/shared/primitive";
 import { StatusBadge, statusVariant } from "@/components/shared/StatusBadge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 import type { LabReport, LabMarker } from "@/types";
 
 export function LabReportsView() {
   const setView = useAppStore((s) => s.setView);
-  const role = useAppStore((s) => s.role);
   const reports = useAppStore((s) => s.labReports);
   const [selected, setSelected] = useState(reports[0]?.id);
 
   const report = reports.find((r: LabReport) => r.id === selected) ?? reports[0];
 
-  if (role !== "PATIENT") {
-    return (
-      <PatientPageShell title="Lab Reports" currentTab="HOSPITAL_HOME" onBack={() => setView("HOSPITAL_HOME")}>
-        <div className="flex flex-col items-center py-16 text-center">
-          <FlaskConical className="size-12 text-muted-foreground" />
-          <p className="mt-3 text-sm font-semibold">Patient login required</p>
-          <p className="mt-1 text-xs text-muted-foreground">Please login as a patient to view investigation reports.</p>
-          <button onClick={() => { setView("HOSPITAL_HOME"); }}
-            className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">Back to home</button>
-        </div>
-      </PatientPageShell>
-    );
-  }
-
   if (reports.length === 0) {
     return (
-      <PatientPageShell title="Lab Reports" currentTab="HOSPITAL_HOME" onBack={() => setView("HOSPITAL_HOME")}>
+      <DoctorPageShell title="Lab Reports" currentTab="DOCTOR_HOME" onBack={() => setView("DOCTOR_HOME")}>
         <EmptyState title="No lab reports yet" hint="Investigation reports shared with you will appear here." icon={FlaskConical} />
-      </PatientPageShell>
+      </DoctorPageShell>
     );
   }
 
   return (
-    <PatientPageShell title="Lab Reports" currentTab="HOSPITAL_HOME" onBack={() => setView("HOSPITAL_HOME")}>
+    <DoctorPageShell title="Lab Reports" currentTab="DOCTOR_HOME" onBack={() => setView("DOCTOR_HOME")}>
       <div className="mb-3 flex gap-2 overflow-x-auto no-scrollbar">
         {reports.map((r: LabReport) => (
           <button key={r.id} onClick={() => setSelected(r.id)}
@@ -87,6 +72,6 @@ export function LabReportsView() {
           </div>
         </div>
       )}
-    </PatientPageShell>
+    </DoctorPageShell>
   );
 }

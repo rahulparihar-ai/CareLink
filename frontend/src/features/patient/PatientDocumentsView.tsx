@@ -16,10 +16,10 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { PatientPageShell } from "@/components/shared/PatientPageShell";
-import { EmptyState, SyntheticNote } from "@/components/shared/primitive";
+import { PatientPageShell } from "@/layouts/PatientPageShell";
+import { EmptyState } from "@/components/shared/primitive";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 const cats = [
   { key: "all", label: "All", icon: FolderOpen },
@@ -141,7 +141,6 @@ export function PatientDocumentsView() {
                     {d.type} · {d.dateStr} · {d.hospital ?? d.doctor}
                   </p>
                   <div className="mt-1 flex items-center gap-2">
-                    <SyntheticNote text="Demo" />
                     {d.confidence && (
                       <span className="text-[10px] text-muted-foreground">
                         OCR confidence {d.confidence}%

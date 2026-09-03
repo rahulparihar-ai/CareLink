@@ -6,12 +6,14 @@ import {
   LogOut, ChevronRight, Save, Globe, Check,
 } from "lucide-react";
 import { useAppStore } from "@/store";
-import { DoctorPageShell } from "@/components/shared/DoctorPageShell";
+import { DoctorPageShell } from "@/layouts/DoctorPageShell";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/lib/i18n/useTranslation";
-import { cn } from "@/lib/utils";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { useTranslation } from "@/i18n/useTranslation";
+import { cn } from "@/utils";
 import type { ThemeName } from "@/types";
-import { SUPPORTED_LANGUAGES } from "@/lib/i18n/translations";
+import { SUPPORTED_LANGUAGES } from "@/i18n/translations";
+import { verificationLabel } from "@/data/organizations";
 
 const themes: { key: ThemeName; swatch: string }[] = [
   { key: "white", swatch: "bg-white border border-black/10" },
@@ -47,6 +49,32 @@ export function DoctorSettingsView() {
 
   return (
     <DoctorPageShell title="Doctor Settings" currentTab="DOCTOR_SETTINGS">
+      {/* Professional verification & affiliation (separate concepts) */}
+      <div className="rounded-2xl border border-border bg-card p-4 card-soft">
+        <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold"><BadgeCheck className="size-4 text-primary" /> Verification</h2>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="rounded-xl bg-muted/40 p-3">
+            <p className="text-xs text-muted-foreground">Professional Verification</p>
+            <StatusBadge variant={doctor?.professionalVerification === "verified" ? "success" : "warning"} dot>
+              {doctor?.professionalVerification === "verified" ? "Demo Verified" : "Verification Pending"}
+            </StatusBadge>
+          </div>
+          <div className="rounded-xl bg-muted/40 p-3">
+            <p className="text-xs text-muted-foreground">Workplace Affiliation</p>
+            {doctor?.affiliationStatus === "none" ? (
+              <StatusBadge variant="muted" dot>Independent</StatusBadge>
+            ) : doctor?.affiliationStatus === "approved" ? (
+              <StatusBadge variant="success" dot>Approved</StatusBadge>
+            ) : (
+              <StatusBadge variant="warning" dot>Affiliation Pending</StatusBadge>
+            )}
+          </div>
+        </div>
+        <p className="mt-3 text-[11px] text-muted-foreground">
+          {doctor?.practiceType} · {doctor?.workplace || "No workplace set"} · {verificationLabel(doctor?.professionalVerification ?? "pending")} is a demo label, not government verification.
+        </p>
+      </div>
+
       {/* Profile */}
       <div className="rounded-2xl border border-border bg-card p-4 card-soft">
         <h2 className="mb-3 flex items-center gap-1.5 text-sm font-semibold"><User className="size-4 text-primary" /> Profile</h2>

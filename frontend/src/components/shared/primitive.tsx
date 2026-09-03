@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Sparkles, AlertCircle, Inbox, RefreshCw, ShieldAlert } from "lucide-react";
-import { cn, toneBg } from "@/lib/utils";
+import { cn, toneBg } from "@/utils";
 import { Button } from "@/components/ui/button";
 
 // ---- Skeleton ----
