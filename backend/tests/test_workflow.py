@@ -112,3 +112,31 @@ def test_followup_added(client):
                      json={"followup_date": "2026-10-01", "reason": "review"})
     # should be forbidden without consent
     assert fu.status_code == 403
+
+
+def test_ai_guidance_nutrition_chat(client):
+    # Patient can request wellness guidance; backend proxies to AI service and
+    # degrades to a mock reply (never a 5xx) even when the AI service is
+    # unreachable in tests.
+    register_patient(client, mobile="9040000100", full_name="PatAI", password="pw1111")
+    tok = login(client, "9040000100", "pw1111").json()["data"]["access_token"]
+    headers = {"Authorization": f"Bearer {tok}"}
+
+    g = client.post("/api/v1/ai/guidance", headers=headers,
+                    json={"topic": "sleep", "language": "en"})
+    assert g.status_code == 200, g.text
+    assert "reply" in g.json()["data"]
+
+    n = client.post("/api/v1/ai/nutrition", headers=headers,
+                    json={"question": "healthy breakfast ideas?", "language": "en"})
+    assert n.status_code == 200, n.text
+    assert "reply" in n.json()["data"]
+
+    c = client.post("/api/v1/ai/chat", headers=headers,
+                    json={"message": "hello", "language": "en"})
+    assert c.status_code == 200, c.text
+    assert "reply" in c.json()["data"]
+
+    # Unauthenticated requests are rejected.
+    assert client.post("/api/v1/ai/guidance",
+                       json={"topic": "sleep"}).status_code == 401

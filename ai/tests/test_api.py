@@ -78,3 +78,41 @@ def test_error_shapes_are_consistent_when_missing_body(client: TestClient):
     # so a missing field should still be a structured 422.
     resp = client.post("/api/ai/lang/detect", json={})
     assert resp.status_code == 422
+
+
+def test_guidance_endpoint(client: TestClient):
+    resp = client.post("/api/ai/guidance", json={"topic": "sleep", "language": "en"})
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["title"]
+    assert "reply" in data
+    assert data["disclaimer"]
+    assert data["mock"] is True  # mock mode by default
+
+
+def test_nutrition_endpoint(client: TestClient):
+    resp = client.post("/api/ai/nutrition", json={
+        "question": "Ideas for a healthy breakfast?",
+        "preferences": ["vegetarian"], "language": "en",
+    })
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["title"] == "Nutrition guidance"
+    assert "reply" in data
+    assert data["disclaimer"]
+
+
+def test_patient_chat_endpoint(client: TestClient):
+    resp = client.post("/api/ai/chat", json={
+        "message": "I have a headache", "language": "en",
+    })
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert "reply" in data
+    assert data["disclaimer"]
+    assert data["mock"] is True
+
+
+def test_nutrition_requires_question(client: TestClient):
+    resp = client.post("/api/ai/nutrition", json={"language": "en"})
+    assert resp.status_code == 422

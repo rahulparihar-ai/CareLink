@@ -92,7 +92,7 @@ export interface DoctorProfile {
   // Professional type: drives which credential fields are shown (spec §1).
   professionType?: "medical-doctor" | "nurse" | "allied" | "other";
   // --- Professional registration (spec §5, §29) ---
-  dateOfBirth?: string;
+  age?: string;
   profession?: string;
   qualification?: string;
   registrationNumber?: string;

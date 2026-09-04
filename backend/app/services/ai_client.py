@@ -94,6 +94,61 @@ class AiClient:
         except AiUnavailable:
             return False
 
+    def guidance(self, topic: str, sub_topic: Optional[str],
+                 language: str = "en",
+                 patient_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        try:
+            result = self._post("/guidance", {
+                "topic": topic,
+                "sub_topic": sub_topic,
+                "language": language,
+                "patient_context": patient_context or {},
+            })
+        except AiUnavailable:
+            return self._guidance_mock(topic)
+        result.setdefault("title", f"Guidance: {sub_topic or topic}")
+        return result
+
+    def nutrition(self, question: str,
+                  preferences: Optional[List[str]] = None,
+                  language: str = "en") -> Dict[str, Any]:
+        try:
+            result = self._post("/nutrition", {
+                "question": question,
+                "preferences": preferences or [],
+                "language": language,
+            })
+        except AiUnavailable:
+            return self._guidance_mock("nutrition")
+        result.setdefault("title", "Nutrition guidance")
+        return result
+
+    def patient_chat(self, message: str,
+                     context: Optional[Dict[str, Any]] = None,
+                     language: str = "en") -> Dict[str, Any]:
+        try:
+            result = self._post("/chat", {
+                "message": message,
+                "context": context or {},
+                "language": language,
+            })
+        except AiUnavailable:
+            return self._guidance_mock("chat")
+        result.setdefault("title", "Health assistant")
+        return result
+
+    @staticmethod
+    def _guidance_mock(kind: str) -> Dict[str, Any]:
+        return {
+            "reply": ("AI assistance is temporarily unavailable. "
+                      "Please ask a doctor for personal medical guidance."),
+            "mock": True,
+            "provider": "mock",
+            "model": "mock",
+            "disclaimer": "This is general information, not medical advice.",
+            "title": f"Guidance: {kind}",
+        }
+
 
 class AiUnavailable(Exception):
     pass

@@ -88,8 +88,15 @@ def verify_otp(db: Session, mobile: str, otp: str,
     if not record or record.consumed:
         return False
     from datetime import datetime, timezone
-    if record.expires_at is not None and datetime.now(timezone.utc) > record.expires_at:
-        return False
+
+    if record.expires_at is not None:
+        expires = record.expires_at
+        # SQLite returns naive datetimes for DateTime(timezone=True); treat them
+        # as UTC to compare correctly against a timezone-aware "now".
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+        if datetime.now(timezone.utc) > expires:
+            return False
     if not verify_otp_hash(otp, record.code_hash):
         return False
     record.consumed = True

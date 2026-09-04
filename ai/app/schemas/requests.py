@@ -69,3 +69,25 @@ class OnboardRequest(BaseModel):
 class ValidateRequest(BaseModel):
     text: str
     task: Optional[str] = None
+
+
+class GuidanceRequest(BaseModel):
+    topic: str = Field(description="Guidance topic key (routine/sleep/nutrition/etc.)")
+    sub_topic: Optional[str] = Field(default=None, description="Optional more specific sub-topic")
+    language: str = "en"
+    patient_context: Optional[Dict[str, Any]] = Field(default_factory=dict,
+                                                      description="General, non-clinical context")
+
+
+class NutritionRequest(BaseModel):
+    question: str = Field(description="Patient's nutrition question")
+    preferences: Optional[List[str]] = Field(default_factory=list,
+                                             description="Dietary preferences / restrictions (general)")
+    language: str = "en"
+
+
+class PatientChatRequest(BaseModel):
+    message: str = Field(description="Patient's message to the health assistant")
+    context: Optional[Dict[str, Any]] = Field(default_factory=dict,
+                                              description="General non-clinical context")
+    language: str = "en"

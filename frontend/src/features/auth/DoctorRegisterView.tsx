@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft, ChevronRight, Stethoscope, Phone, ShieldCheck, CheckCircle2,
   UserRound, Lock, Building2, AlertTriangle, BadgeCheck, Search,
-  Briefcase, UserCheck, Mail, MailCheck, Check, Copy,
+  Briefcase, UserCheck, MailCheck, Check, Copy,
 } from "lucide-react";
 import { useAppStore } from "@/store";
 import { generatePatientId } from "@/lib/brand/constants";
@@ -68,7 +68,7 @@ export function DoctorRegisterView() {
   const [sendingOtp, setSendingOtp] = useState(false);
 
   // Step 3 — basic details
-  const [basic, setBasic] = useState({ name: "", dob: "", gender: "", languages: "", email: "" });
+  const [basic, setBasic] = useState({ name: "", age: "", gender: "", languages: "" });
 
   // Step 4 — credentials (profession-specific)
   const [creds, setCreds] = useState({
@@ -85,7 +85,7 @@ export function DoctorRegisterView() {
   const [idChecking, setIdChecking] = useState(false);
 
   // Step 7 — account
-  const [account, setAccount] = useState({ email: "", password: "", confirm: "" });
+  const [account, setAccount] = useState({ password: "", confirm: "" });
 
   // Step 8-10 — practice type & workplace
   const [practiceType, setPracticeType] = useState<PracticeType | "">("");
@@ -205,7 +205,7 @@ export function DoctorRegisterView() {
       password: account.password || undefined,
       languages: langs,
       experience: creds.experience || undefined,
-      dateOfBirth: basic.dob || undefined,
+      age: basic.age || undefined,
       mobileVerified: true,
       professionType: (professionType || "medical-doctor"),
       profession: PROFESSION_TYPES.find((p) => p.value === professionType)?.label ?? "Medical Doctor",
@@ -434,8 +434,9 @@ export function DoctorRegisterView() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium">{t("dreg.dateOfBirth")}</label>
-                      <input type="date" value={basic.dob} onChange={(e) => set("dob", e.target.value)} className={inputCls} />
+                      <label className="mb-1.5 block text-sm font-medium">{t("dreg.age")}</label>
+                      <input type="number" inputMode="numeric" min={18} max={90} value={basic.age}
+                        onChange={(e) => set("age", e.target.value.replace(/\D/g, "").slice(0, 3))} placeholder="35" className={inputCls} />
                     </div>
                     <div>
                       <label className="mb-1.5 block text-sm font-medium">{t("dreg.gender")}</label>
@@ -452,14 +453,6 @@ export function DoctorRegisterView() {
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">{t("dreg.languages")}</label>
                     <input value={basic.languages} onChange={(e) => set("languages", e.target.value)} placeholder="English, Hindi, Urdu" className={inputCls} />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-medium">{t("dreg.email")}</label>
-                    <input type="email" value={basic.email} onChange={(e) => set("email", e.target.value)} placeholder="you@example.com" className={inputCls} />
-                    <div className="mt-2 flex items-center justify-between rounded-xl border border-border bg-card px-3 py-2.5 text-sm">
-                      <span className="text-muted-foreground">{t("dreg.account.mobileLinked")}: +91 {mobile}</span>
-                      <Mail className="size-4 text-emerald-600" />
-                    </div>
                   </div>
                 </div>
               </div>
@@ -796,10 +789,6 @@ export function DoctorRegisterView() {
         return;
       case "basic":
         if (!basic.name.trim()) { setError(t("dreg.nameRequired")); return; }
-        if (account.email || basic.email) {
-          const em = account.email || basic.email;
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { setError(t("dreg.emailInvalid")); return; }
-        }
         setStep("credentials");
         return;
       case "credentials":
@@ -814,7 +803,6 @@ export function DoctorRegisterView() {
         if (!account.password) { setError(t("dreg.account.passShort")); return; }
         if (account.password.length < 6) { setError(t("dreg.account.passShort")); return; }
         if (account.password !== account.confirm) { setError(t("dreg.account.passMismatch")); return; }
-        if (account.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account.email)) { setError(t("dreg.emailInvalid")); return; }
         setStep("practice");
         return;
       }

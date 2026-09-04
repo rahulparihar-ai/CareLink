@@ -15,7 +15,6 @@ import {
   Activity,
   UserPlus,
   ScanLine,
-  FlaskConical,
 } from "lucide-react";
 import { useAppStore, type View } from "@/store";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
@@ -68,7 +67,6 @@ export function NavigationDrawer({
     { label: t("doctor.followups"), icon: LayoutGrid, view: "DOCTOR_FOLLOWUPS" },
     { label: t("doctor.registerPatient"), icon: UserPlus, view: "REGISTER_PATIENT" },
     { label: t("doctor.scanPrescription"), icon: ScanLine, view: "SCAN_PRESCRIPTION" },
-    { label: t("doctor.labReports"), icon: FlaskConical, view: "LAB_REPORTS" },
     { label: t("nav.settings"), icon: Settings, view: "DOCTOR_SETTINGS" },
   ];
 

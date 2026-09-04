@@ -16,9 +16,12 @@ from ai.app.schemas.requests import (
     DetectRequest,
     DocTLRequest,
     DocumentRequest,
+    GuidanceRequest,
     HistoryRequest,
     InterviewRequest,
+    NutritionRequest,
     OnboardRequest,
+    PatientChatRequest,
     RedFlagRequest,
     TranslateRequest,
     ValidateRequest,
@@ -171,6 +174,42 @@ def document_timeline(req: DocTLRequest, request: Request) -> StandardResponse:
 def onboarding(req: OnboardRequest, request: Request) -> StandardResponse:
     result = _svc().onboarding_guide(req)
     return _wrap(request, "onboarding_guide", result)
+
+
+# -- wellness guidance / nutrition / patient chat --------------------------
+
+
+@router.post("/guidance", response_model=StandardResponse)
+def guidance(req: GuidanceRequest, request: Request) -> StandardResponse:
+    result = _svc().guidance(req)
+    warnings = result.pop("warnings", [])
+    resp = _wrap(request, "guidance", result, warnings)
+    resp.metadata.language_code = req.language
+    resp.metadata.model = result.get("model")
+    resp.metadata.mock = result.get("mock", True)
+    return resp
+
+
+@router.post("/nutrition", response_model=StandardResponse)
+def nutrition(req: NutritionRequest, request: Request) -> StandardResponse:
+    result = _svc().nutrition(req)
+    warnings = result.pop("warnings", [])
+    resp = _wrap(request, "nutrition", result, warnings)
+    resp.metadata.language_code = req.language
+    resp.metadata.model = result.get("model")
+    resp.metadata.mock = result.get("mock", True)
+    return resp
+
+
+@router.post("/chat", response_model=StandardResponse)
+def patient_chat(req: PatientChatRequest, request: Request) -> StandardResponse:
+    result = _svc().patient_chat(req)
+    warnings = result.pop("warnings", [])
+    resp = _wrap(request, "patient_chat", result, warnings)
+    resp.metadata.language_code = req.language
+    resp.metadata.model = result.get("model")
+    resp.metadata.mock = result.get("mock", True)
+    return resp
 
 
 @router.post("/validate", response_model=StandardResponse)

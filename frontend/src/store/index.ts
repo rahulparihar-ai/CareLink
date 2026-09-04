@@ -145,6 +145,8 @@ interface AppState {
   // profiles
   patientProfile: PatientProfile | null;
   setPatientProfile: (p: PatientProfile) => void;
+  patientRegistry: PatientProfile[];
+  upsertPatient: (p: PatientProfile) => void;
   doctorProfile: DoctorProfile | null;
   setDoctorProfile: (p: DoctorProfile) => void;
 
@@ -285,7 +287,20 @@ export const useAppStore = create<AppState>()(
       // Profiles start empty — the app only ever shows data the user
       // actually enters, so there is no pre-seeded/mock data.
       patientProfile: null,
-      setPatientProfile: (p) => set({ patientProfile: p }),
+      setPatientProfile: (p) =>
+        set((s) => ({
+          patientProfile: p,
+          patientRegistry: s.patientRegistry.some((x) => x.id === p.id)
+            ? s.patientRegistry.map((x) => (x.id === p.id ? p : x))
+            : [...s.patientRegistry, p],
+        })),
+      patientRegistry: [],
+      upsertPatient: (p) =>
+        set((s) => ({
+          patientRegistry: s.patientRegistry.some((x) => x.id === p.id)
+            ? s.patientRegistry.map((x) => (x.id === p.id ? { ...x, ...p } : x))
+            : [...s.patientRegistry, p],
+        })),
       doctorProfile: null,
       setDoctorProfile: (p) => set({ doctorProfile: p }),
 
@@ -491,6 +506,7 @@ export const useAppStore = create<AppState>()(
         isUnlocked: s.isUnlocked,
         intakeSession: s.intakeSession,
         caseQueue: s.caseQueue,
+        patientRegistry: s.patientRegistry,
         caseQueueDemo: s.caseQueueDemo,
         auditTrail: s.auditTrail,
       }),

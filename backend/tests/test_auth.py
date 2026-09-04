@@ -81,3 +81,33 @@ def test_doctor_registration(client):
     r = register_doctor(client)
     assert r.status_code == 200, r.text
     assert r.json()["data"]["role"] == "DOCTOR"
+
+
+def test_otp_verify_and_login(client):
+    # Regression: DateTime(timezone=True) on SQLite returns naive datetimes;
+    # verify_otp must handle the comparison without a TypeError.
+    client.post("/api/v1/auth/send-otp",
+                json={"mobile": "9000000600", "purpose": "login"})
+    r = client.post("/api/v1/auth/verify-otp",
+                    json={"mobile": "9000000600", "otp": "123456", "purpose": "login"})
+    assert r.status_code == 200, r.text
+    assert r.json()["data"]["verified"] is True
+
+    register_patient(client, mobile="9000000600", password="pass1234")
+    client.post("/api/v1/auth/send-otp",
+                json={"mobile": "9000000600", "purpose": "login"})
+    r = client.post("/api/v1/auth/login/otp",
+                    json={"mobile": "9000000600", "otp": "123456"})
+    assert r.status_code == 200, r.text
+    assert r.json()["data"]["access_token"]
+
+
+def test_register_invalid_body_returns_422_not_500(client):
+    # Regression: manually-built pydantic profile must yield a clean 422,
+    # never an internal 500.
+    r = client.post("/api/v1/auth/register",
+                    json={"role": "doctor",
+                          "profile": {"mobile": "9000000700", "full_name": "Dr X",
+                                      "profession": "Physician", "password": "bad"}})
+    assert r.status_code == 422, r.text
+    assert r.json()["error"]["code"] == "validation_error"

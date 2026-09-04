@@ -13,12 +13,12 @@ GET  /auth/me            current user profile (protected)
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from sqlalchemy.orm import Session
 
 from ...deps import get_current_user
 from ...database import get_db
-from ...middleware.errors import BadRequestError
+from ...middleware.errors import BadRequestError, RequestValidationFailure
 from ...schemas import (
     ApiResponse,
     LoginRequest,
@@ -31,6 +31,17 @@ from ...schemas import (
 from ...services import auth_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+def _first_validation_error(exc: ValidationError) -> str:
+    """Return a concise human-readable message from a pydantic ValidationError."""
+    errors = exc.errors()
+    if not errors:
+        return "invalid value"
+    first = errors[0]
+    loc = " -> ".join(str(x) for x in first.get("loc", []))
+    msg = first.get("msg") or "invalid value"
+    return f"{loc}: {msg}" if loc else msg
 
 
 class OtpResponse(BaseModel):
@@ -61,18 +72,20 @@ def verify_otp(req: VerifyOtpRequest, db: Session = Depends(get_db)) -> ApiRespo
 @router.post("/register", response_model=ApiResponse[dict])
 def register(req: Request, body: dict, db: Session = Depends(get_db)) -> ApiResponse:
     role = (body.get("role") or "patient").lower()
-    if role in ("patient", "doctor"):
-        pass  # handled below
-    else:
+    if role not in ("patient", "doctor", "hospital_admin", "system_admin"):
         raise BadRequestError("Unsupported role.")
 
-    if role == "doctor":
-        data = RegisterDoctorRequest(**body.get("profile", body))
-        result = auth_service.register_doctor(db, data)
-    else:
-        data = RegisterPatientRequest(**body.get("profile", body))
-        otp = body.get("otp")
-        result = auth_service.register_patient(db, data, otp=otp)
+    profile = body.get("profile", body)
+    try:
+        if role == "doctor":
+            data = RegisterDoctorRequest(**profile)
+            result = auth_service.register_doctor(db, data)
+        else:
+            data = RegisterPatientRequest(**profile)
+            otp = body.get("otp")
+            result = auth_service.register_patient(db, data, otp=otp)
+    except ValidationError as exc:
+        raise RequestValidationFailure("Invalid profile: " + _first_validation_error(exc))
     return ApiResponse(data=result["user"], message="Registration successful.")
 
 

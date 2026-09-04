@@ -3,10 +3,11 @@
 import { useState } from "react";
 import {
   Users, AlertTriangle, ClipboardCheck, FileText,
-  CalendarDays, ChevronRight, Bell, Search, TrendingUp, Sparkles,
+  CalendarDays, ChevronRight, Bell, Search, TrendingUp, Sparkles, QrCode,
 } from "lucide-react";
 import { useAppStore } from "@/store";
 import { NavigationDrawer } from "@/layouts/NavigationDrawer";
+import { DoctorScanPatientModal } from "@/features/doctor/DoctorScanPatientModal";
 import { StatusBadge, statusVariant } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +16,7 @@ export function DoctorHome() {
   const doctor = useAppStore((s) => s.doctorProfile);
   const setSelectedPatientId = useAppStore((s) => s.setSelectedPatientId);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
   const unread = useAppStore((s) => s.notifications.filter((n) => !n.read).length);
   const caseQueue = useAppStore((s) => s.caseQueue);
   const caseQueueDemo = useAppStore((s) => s.caseQueueDemo);
@@ -77,6 +79,19 @@ export function DoctorHome() {
             <span>Showing demo patient queue. No real medical data.</span>
           </div>
         )}
+        {/* Scan patient QR */}
+        <button onClick={() => setScanOpen(true)}
+          className="mt-4 flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-gradient-to-r from-primary/10 to-primary/5 p-4 text-left card-soft transition-colors hover:bg-primary/10">
+          <div className="flex items-center gap-3">
+            <span className="flex size-11 items-center justify-center rounded-xl bg-primary/15"><QrCode className="size-6 text-primary" /></span>
+            <div>
+              <p className="font-semibold">Scan Patient QR</p>
+              <p className="text-xs text-muted-foreground">Scan to pull up patient details instantly</p>
+            </div>
+          </div>
+          <ChevronRight className="size-5 text-muted-foreground" />
+        </button>
+
         {/* Stats */}
         <div className="mt-4 grid grid-cols-2 gap-2.5">
           <StatCard icon={Users} label="Patients Waiting" value={waiting} tone="bg-sky-500/10 text-sky-600" />
@@ -168,6 +183,7 @@ export function DoctorHome() {
 
       <div className="h-10" />
       <NavigationDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      <DoctorScanPatientModal open={scanOpen} onClose={() => setScanOpen(false)} />
     </div>
   );
 }

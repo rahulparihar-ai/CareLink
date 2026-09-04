@@ -20,14 +20,18 @@ from ai.app.schemas.requests import (
     DetectRequest,
     DocTLRequest,
     DocumentRequest,
+    GuidanceRequest,
     HistoryRequest,
     ImportRequest,
     InterviewRequest,
+    NutritionRequest,
     OnboardRequest,
+    PatientChatRequest,
     RedFlagRequest,
     TranslateRequest,
     ValidateRequest,
 )
+from ai.app.services.guidance import create_guidance_service
 
 
 class AppServices:
@@ -36,6 +40,7 @@ class AppServices:
         self.translation = create_translation_service(self.settings)
         self.clinical = create_clinical_services(self.settings)
         self.documents = create_document_processor(self.settings)
+        self.wellness = create_guidance_service(self.settings)
         self.source = SourceManager(redact_pii=True)
 
     # ---- guard helpers ---------------------------------------------------
@@ -158,6 +163,24 @@ class AppServices:
             "history for your doctor; it does not diagnose on its own."
         )
         return {"guide": guide, "language": lang}
+
+    # ---- wellness guidance / nutrition / general health chat -------------
+
+    def guidance(self, req: GuidanceRequest) -> Dict[str, Any]:
+        return self.wellness.guidance(
+            req.topic, req.sub_topic, language=req.language,
+            patient_context=req.patient_context,
+        )
+
+    def nutrition(self, req: NutritionRequest) -> Dict[str, Any]:
+        return self.wellness.nutrition(
+            req.question, preferences=req.preferences, language=req.language,
+        )
+
+    def patient_chat(self, req: PatientChatRequest) -> Dict[str, Any]:
+        return self.wellness.chat(
+            req.message, context=req.context, language=req.language,
+        )
 
     # ---- validation / import (structured) --------------------------------
 

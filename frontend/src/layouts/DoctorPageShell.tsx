@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, LayoutDashboard, Users, Activity, FileText, User } from "lucide-react";
+import { ChevronLeft, LayoutDashboard, Users, Activity, FileText, User, Stethoscope, HeartHandshake, CalendarCheck } from "lucide-react";
 import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { CareLinkLogo } from "@/components/brand/CareLinkLogo";
@@ -14,12 +14,15 @@ export function DoctorBottomNav({ current }: { current: string }) {
     { key: "DOCTOR_HOME", label: t("doctor.dashboard"), icon: LayoutDashboard },
     { key: "DOCTOR_QUEUE", label: t("doctor.patients"), icon: Users },
     { key: "DOCTOR_PRIORITY", label: t("doctor.priority"), icon: Activity },
+    { key: "DOCTOR_CASES", label: t("doctor.cases"), icon: Stethoscope },
+    { key: "DOCTOR_PRESCRIPTIONS", label: t("doctor.prescriptions"), icon: HeartHandshake },
+    { key: "DOCTOR_FOLLOWUPS", label: t("doctor.followups"), icon: CalendarCheck },
     { key: "DOCTOR_NOTES", label: t("doctor.notes"), icon: FileText },
     { key: "DOCTOR_SETTINGS", label: t("nav.profile"), icon: User },
   ];
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[640px] border-t border-border bg-card/95 backdrop-blur-md pb-safe lg:max-w-[820px]" aria-label="Doctor navigation">
-      <div className="grid grid-cols-5 px-1">
+      <div className="grid grid-cols-8 px-0.5">
         {tabs.map((t) => {
           const active = current === t.key;
           return (

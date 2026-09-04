@@ -403,6 +403,25 @@ class AiHistoryResponseRef(BaseModel):
     mock: bool = True
 
 
+class GuidanceRequest(BaseModel):
+    topic: str = "general"
+    sub_topic: Optional[str] = None
+    language: str = "en"
+    patient_context: Dict[str, Any] = Field(default_factory=dict)
+
+
+class NutritionRequest(BaseModel):
+    question: str
+    preferences: list[str] = Field(default_factory=list)
+    language: str = "en"
+
+
+class PatientChatRequest(BaseModel):
+    message: str
+    context: Dict[str, Any] = Field(default_factory=dict)
+    language: str = "en"
+
+
 # ---------------------------------------------------------------- audit
 
 
