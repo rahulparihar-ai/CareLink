@@ -1,8 +1,5 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
-/frontend/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -11,17 +8,13 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
 # next.js
 /.next/
 /out/
-/frontend/.next/
-/frontend/out/
 
 # production
 /build
+/coverage
 
 # misc
 .DS_Store
@@ -33,8 +26,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -42,33 +36,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# python / backend
-__pycache__/
-*.py[cod]
-*.egg-info/
-.env
-
-# database backups (runtime artifacts)
-/database/backups/*
-
-# python / backend
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pytest_cache/
-htmlcov/
-.tox/
-
-# backend local sqlite + storage (never commit patient data)
-*.db
-*.sqlite3
-/backend/*.db
-/backend/storage/
-/storage/
-/backend/alembic_snap.db
-/backend/alembic_up.db
-
-# ai service
-.ai/.venv/
-ai/.venv/
