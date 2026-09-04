@@ -1,0 +1,20 @@
+# CareLink — Streamlit deployment dependencies
+# Install with: pip install -r requirements-streamlit.txt
+
+streamlit==1.45.1
+requests==2.32.3
+
+# Backend (pulled in transitively when you also install backend/requirements.txt)
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+pydantic==2.11.4
+SQLAlchemy==2.0.40
+python-jose[cryptography]==3.4.0
+bcrypt==5.0.0
+httpx==0.28.1
+python-multipart==0.0.20
+alembic==1.14.0
+psycopg2-binary==2.9.10
+
+# AI service
+# (ai/requirements.txt is a subset of the above — no extra packages needed)

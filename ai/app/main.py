@@ -18,8 +18,7 @@ from ai.app.routes import set_services
 from ai.app.services.orchestration import create_app_services
 from ai.app.middleware import (
     RequestIdMiddleware,
-    build_cors,
-    build_security_middleware,
+    SecurityMiddleware,
 )
 
 
@@ -36,13 +35,18 @@ def create_app() -> FastAPI:
     )
 
     # Middleware order matters: request-id first so downstream can use it.
-    if settings.cors_origins:
-        app.add_middleware(
-            build_cors(app, settings.cors_origins)  # type: ignore[arg-type]
-        )
     app.add_middleware(RequestIdMiddleware, header=settings.request_id_header)
+    if settings.cors_origins:
+        from starlette.middleware.cors import CORSMiddleware
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.cors_origins,
+            allow_credentials=False,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
     if settings.require_auth:
-        app.add_middleware(build_security_middleware(app, settings))
+        app.add_middleware(SecurityMiddleware, settings=settings)
 
     # Wire services.
     services = create_app_services(settings)

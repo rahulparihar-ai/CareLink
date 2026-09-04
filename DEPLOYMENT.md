@@ -15,12 +15,12 @@ CareLink is full-stack: a **Next.js frontend**, a **FastAPI backend**, a **FastA
 
 ## 1. Frontend → Vercel
 
-A repo-root **`vercel.json`** is included with `"rootDirectory": "frontend"`, so Vercel automatically builds the Next.js app in `frontend/`. This fixes the `NOT_FOUND` (404) you saw when Vercel tried to build the repo root (which has no `package.json`). `frontend/.vercelignore` is also included.
+The repo is a **monorepo**: the Next.js app lives in `frontend/` and the repo root has **no `package.json`**. If Vercel's Root Directory is not set to `frontend`, the build produces nothing and every URL returns `NOT_FOUND` (404). You MUST set it in the dashboard.
 
 ### Dashboard (recommended)
 1. Push this repo to GitHub.
 2. Vercel → **Add New… → Project** → Import the GitHub repo.
-3. **Root Directory** should auto-fill as `frontend` from `vercel.json` (framework auto-detects as Next.js). If not, set it to `frontend` manually.
+3. **Root Directory**: set to `frontend` (framework auto-detects as Next.js, build command `npm run build`).
 4. **Environment Variables** (Project → Settings → Environment Variables), all **server-only**:
 
    | Key | Value |

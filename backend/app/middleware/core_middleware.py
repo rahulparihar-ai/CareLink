@@ -38,14 +38,12 @@ class RequestContextMiddleware:
         _session_state.request_id = rid
 
         start = time.monotonic()
-        response = await self.app(scope, receive, send)
+        await self.app(scope, receive, send)
         latency_ms = int((time.monotonic() - start) * 1000)
-        status = getattr(response, "status_code", 0)
         logger.info(
-            "request ridge=%s method=%s path=%s status=%s latency_ms=%s",
-            rid, scope.get("method"), scope.get("path"), status, latency_ms,
+            "request id=%s method=%s path=%s latency_ms=%s",
+            rid, scope.get("method"), scope.get("path"), latency_ms,
         )
-        return response
 
 
 class SimpleRateLimiter:
