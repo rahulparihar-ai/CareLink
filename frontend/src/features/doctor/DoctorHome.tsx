@@ -27,6 +27,8 @@ export function DoctorHome() {
   const pendingSummaries = caseQueue.filter((p) => p.summaryStatus === "pending").length;
 
   const queue = caseQueue.filter((p) => p.status !== "COMPLETED");
+  const ayushQueue = useAppStore((s) => s.ayushDoctorQueue);
+  const ayushReady = ayushQueue.filter((e) => e.status !== "COMPLETED");
 
   const openPatient = (id: string) => {
     setSelectedPatientId(id);
@@ -42,6 +44,22 @@ export function DoctorHome() {
             className="flex w-full items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/5 p-2.5 text-xs font-medium text-violet-700 card-soft transition-colors hover:bg-violet-500/10">
             <Sparkles className="size-4" />
             New AI Clinical History ready for review
+            <ChevronRight className="ml-auto size-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* AYUSH Intelligence ready */}
+      {ayushReady.length > 0 && (
+        <div className="mx-4 mt-2">
+          <button onClick={() => {
+            const first = ayushReady[0];
+            useAppStore.getState().setSelectedPatientId(first.patientId);
+            setView("DOCTOR_AYUSH_REVIEW");
+          }}
+            className="flex w-full items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-2.5 text-xs font-medium text-emerald-700 card-soft transition-colors hover:bg-emerald-500/10">
+            <Sparkles className="size-4" />
+            AYUSH History ready — {ayushReady.length} patient(s)
             <ChevronRight className="ml-auto size-3.5" />
           </button>
         </div>

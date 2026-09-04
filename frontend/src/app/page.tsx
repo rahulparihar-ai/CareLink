@@ -74,6 +74,12 @@ import { IntakeSummary } from "@/features/intake/IntakeSummary";
 import { IntakeComplete } from "@/features/intake/IntakeComplete";
 import { DoctorClinicalView } from "@/features/intake/DoctorClinicalView";
 
+// AYUSH Intelligence
+import { AyushHistoryEntry } from "@/features/ayush/AyushHistoryEntry";
+import { AyushInterviewView } from "@/features/ayush/AyushInterviewView";
+import { AyushSummaryView } from "@/features/ayush/AyushSummaryView";
+import { DoctorAyushReview } from "@/features/ayush/DoctorAyushReview";
+
 export default function MobileApp() {
   const currentView = useAppStore((s) => s.currentView);
   const role = useAppStore((s) => s.role);
@@ -178,6 +184,20 @@ export default function MobileApp() {
       break;
     case "DOCTOR_CLINICAL":
       content = <DoctorClinicalView />;
+      break;
+
+    // AYUSH Intelligence
+    case "PATIENT_AYUSH":
+      content = <AyushHistoryEntry />;
+      break;
+    case "PATIENT_AYUSH_INTERVIEW":
+      content = <AyushInterviewView />;
+      break;
+    case "PATIENT_AYUSH_SUMMARY":
+      content = <AyushSummaryView />;
+      break;
+    case "DOCTOR_AYUSH_REVIEW":
+      content = <DoctorAyushReview />;
       break;
 
     // Hospital / Reception desk

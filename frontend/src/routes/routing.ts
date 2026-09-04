@@ -47,6 +47,9 @@ const PATIENT_VIEWS = new Set<View>([
   "PATIENT_NUTRITION",
   "PATIENT_LAB",
   "NOTIFICATION_CENTER",
+  "PATIENT_AYUSH",
+  "PATIENT_AYUSH_INTERVIEW",
+  "PATIENT_AYUSH_SUMMARY",
 ]);
 
 const DOCTOR_VIEWS = new Set<View>([
@@ -61,6 +64,7 @@ const DOCTOR_VIEWS = new Set<View>([
   "DOCTOR_FOLLOWUPS",
   "DOCTOR_CONSULTATION",
   "DOCTOR_CLINICAL",
+  "DOCTOR_AYUSH_REVIEW",
 ]);
 
 // Care Link intake self-service case-taking terminal + hospital hub.

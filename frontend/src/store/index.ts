@@ -38,6 +38,11 @@ import type {
   PhysicianSummary,
   DoctorPatientRecord,
 } from "@/types";
+import type {
+  AyushInterviewSession,
+  AyushDoctorQueueEntry,
+  AyushVisitEntry,
+} from "@/types/ayush";
 
 // ---- View names ----
 export type View =
@@ -100,7 +105,13 @@ export type View =
   | "INTAKE_DOCUMENTS"
   | "INTAKE_SUMMARY"
   | "INTAKE_COMPLETE"
-  | "DOCTOR_CLINICAL";
+  | "DOCTOR_CLINICAL"
+
+  // AYUSH Intelligence
+  | "PATIENT_AYUSH"
+  | "PATIENT_AYUSH_INTERVIEW"
+  | "PATIENT_AYUSH_SUMMARY"
+  | "DOCTOR_AYUSH_REVIEW";
 
 interface AppState {
   // navigation
@@ -233,6 +244,19 @@ interface AppState {
   // seed data to development; it never renders in the normal production UI.
   caseQueueDemo: boolean;
   seedDemoCases: () => void;
+
+  // AYUSH Intelligence
+  ayushSession: AyushInterviewSession | null;
+  ayushDoctorQueue: AyushDoctorQueueEntry[];
+  ayushVisitHistory: AyushVisitEntry[];
+  startAyushSession: (partial: Partial<AyushInterviewSession>) => void;
+  updateAyushSession: (patch: Partial<AyushInterviewSession>) => void;
+  completeAyushSession: () => void;
+  resetAyushSession: () => void;
+  addAyushDoctorQueueEntry: (entry: AyushDoctorQueueEntry) => void;
+  updateAyushQueueEntry: (id: string, patch: Partial<AyushDoctorQueueEntry>) => void;
+  removeAyushQueueEntry: (id: string) => void;
+  addAyushVisitEntry: (entry: AyushVisitEntry) => void;
 }
 
 const now = () => new Date().toISOString();
@@ -470,6 +494,93 @@ export const useAppStore = create<AppState>()(
       // empty and waits for real patient intake.
       caseQueueDemo: false,
       seedDemoCases: () => set({}),
+
+      // AYUSH Intelligence
+      ayushSession: null,
+      ayushDoctorQueue: [],
+      ayushVisitHistory: [],
+      startAyushSession: (partial) =>
+        set((s) => {
+          const base: AyushInterviewSession = {
+            id: uid("ayush"),
+            patientId: s.patientProfile?.id,
+            patientName: s.patientProfile?.name,
+            phase: "welcome",
+            inputMode: "voice",
+            language: s.language,
+            consentGiven: false,
+            conversationTurns: [],
+            clinicalHistory: {
+              chiefComplaint: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              duration: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              onset: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              pattern: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              character: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              aggravatingFactors: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              relievingFactors: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              associatedSymptoms: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              severity: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              pastMedicalHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              pastSurgicalHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              currentMedications: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              allergies: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              familyHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              personalHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              dietHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              sleepHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              bowelHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              substanceHistory: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              reviewOfSystems: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+            },
+            ayurvedicAssessment: {
+              dashavidha: {
+                prakriti: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                vikriti: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                sara: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                samhanana: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                pramana: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                satmya: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                sattva: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                aharaShakti: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                vyayamaShakti: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+                vaya: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              },
+              agni: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              koshtha: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              aharaVihara: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              nidana: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+              sampraptiContext: { value: "", source: "PATIENT_REPORTED", confidence: "low", status: "pending", evidence: [], lastUpdated: now() },
+            },
+            redFlags: [],
+            summary: null,
+            historyCompletion: 0,
+            startedAt: now(),
+            isPaused: false,
+            isMuted: false,
+            currentQuestionIndex: 0,
+            askedQuestionIds: [],
+          };
+          return { ayushSession: { ...base, ...partial } };
+        }),
+      updateAyushSession: (patch) =>
+        set((s) => ({ ayushSession: s.ayushSession ? { ...s.ayushSession, ...patch } : null })),
+      completeAyushSession: () =>
+        set((s) => ({
+          ayushSession: s.ayushSession ? { ...s.ayushSession, phase: "complete", completedAt: now() } : null,
+        })),
+      resetAyushSession: () => set({ ayushSession: null }),
+      addAyushDoctorQueueEntry: (entry) =>
+        set((s) => ({ ayushDoctorQueue: [entry, ...s.ayushDoctorQueue] })),
+      updateAyushQueueEntry: (id, patch) =>
+        set((s) => ({
+          ayushDoctorQueue: s.ayushDoctorQueue.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+        })),
+      removeAyushQueueEntry: (id) =>
+        set((s) => ({
+          ayushDoctorQueue: s.ayushDoctorQueue.filter((e) => e.id !== id),
+        })),
+      addAyushVisitEntry: (entry) =>
+        set((s) => ({ ayushVisitHistory: [...s.ayushVisitHistory, entry] })),
     }),
     {
       name: BRAND.storageKey,
@@ -509,6 +620,9 @@ export const useAppStore = create<AppState>()(
         patientRegistry: s.patientRegistry,
         caseQueueDemo: s.caseQueueDemo,
         auditTrail: s.auditTrail,
+        ayushSession: s.ayushSession,
+        ayushDoctorQueue: s.ayushDoctorQueue,
+        ayushVisitHistory: s.ayushVisitHistory,
       }),
     }
   )

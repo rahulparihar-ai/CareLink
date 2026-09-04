@@ -22,6 +22,7 @@ import {
   Droplets,
   Syringe,
   Apple,
+  Leaf,
 } from "lucide-react";
 import { useAppStore } from "@/store";
 import { PatientHeader } from "@/layouts/AppHeader";
@@ -75,6 +76,7 @@ export function PatientHome() {
     {
       title: "Wellness",
       items: [
+        { icon: Leaf, title: "AYUSH History", tone: "green", view: "PATIENT_AYUSH" },
         { icon: Sparkles, title: "AI Guidance", tone: "gold", view: "PATIENT_AI" },
         { icon: Activity, title: "Quick Check", tone: "primary", view: "PATIENT_INTAKE" },
         { icon: Footprints, title: "Steps", tone: "green", view: "PATIENT_STEPS" },

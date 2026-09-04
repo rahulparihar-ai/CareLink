@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, User, Stethoscope, LayoutGrid, HeartHandshake, UserPlus } from "lucide-react";
+import { Home, User, Stethoscope, Leaf, HeartHandshake, UserPlus } from "lucide-react";
 import { cn } from "@/utils";
 import { useAppStore, type View } from "@/store";
 import { useTranslation } from "@/i18n/useTranslation";
@@ -61,7 +61,7 @@ export function PatientBottomNav({ current }: { current: View }) {
   const patientTabs: Tab[] = [
     { key: "PATIENT_HOME", label: t("nav.home"), icon: Home },
     { key: "PATIENT_HISTORY", label: t("nav.health"), icon: HeartHandshake },
-    { key: "PATIENT_APPOINTMENTS", label: t("nav.appointments"), icon: LayoutGrid },
+    { key: "PATIENT_AYUSH", label: t("nav.ayush"), icon: Leaf },
     { key: "PATIENT_AI", label: t("nav.ai"), icon: Stethoscope },
     { key: "PATIENT_PROFILE", label: t("nav.profile"), icon: User },
   ];
