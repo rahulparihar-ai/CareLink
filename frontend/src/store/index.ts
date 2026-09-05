@@ -281,7 +281,7 @@ export const useAppStore = create<AppState>()(
       setHighContrast: (b) => set({ highContrast: b }),
       largeText: false,
       setLargeText: (b) => set({ largeText: b }),
-      audioGuided: false,
+      audioGuided: true,
       setAudioGuided: (b) => set({ audioGuided: b }),
 
       hasSeenSplash: false,

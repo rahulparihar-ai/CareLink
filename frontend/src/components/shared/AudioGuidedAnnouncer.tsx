@@ -2,50 +2,61 @@
 
 import { useEffect, useRef } from "react";
 import { useAppStore } from "@/store";
+import type { View } from "@/store";
 import { useTranslation } from "@/i18n/useTranslation";
+import { speakThor } from "@/features/thor/thorVoice";
+import { buildThorNarration } from "@/features/thor/thorPageDetails";
+import { useThorStore } from "@/features/thor/thorStore";
 
 /**
  * Audio Guided Mode announcer.
  *
- * When the "audio guided mode" accessibility toggle is on, this quietly voices
- * the name of each screen as the user navigates, helping visually impaired
- * users understand where they are. It uses the browser's built-in
- * speechSynthesis API so no additional voices/dependencies are required.
+ * When the "audio guided mode" accessibility toggle is on, screens are read
+ * aloud for visual assistance. Instead of the browser's raw default (often
+ * female) voice, this reads through THOR's voice and speaks EXACTLY the same
+ * text Thor writes in his guide bubble (`buildThorNarration`), so what the
+ * user hears always matches what Thor says on screen.
+ *
+ * Coordination with ThorGuide: ThorGuide narrates fresh, non-first-run pages
+ * on view change; this announcer covers the first-run screens (ROLE_SELECT)
+ * and re-visits, so no page is spoken twice and none is missed.
  */
+const FIRST_VIEWS = new Set<View>(["WELCOME", "ROLE_SELECT", "SPLASH"]);
+
 export function AudioGuidedAnnouncer({ view }: { view: string }) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const audioGuided = useAppStore((s) => s.audioGuided);
+  const muted = useThorStore((s) => s.muted);
+  const setBubble = useThorStore((s) => s.setBubble);
+  const hasSpoken = useThorStore((s) => s.hasSpoken);
   const last = useRef<string>("");
-  const lang = useAppStore((s) => s.language);
+  const prevAudioGuided = useRef<boolean>(audioGuided);
 
   useEffect(() => {
-    if (!audioGuided) return;
-    // Derive a human-friendly label for the current screen.
-    const title =
-      view === "PATIENT_HOME"
-        ? t("auth.patientLogin")
-        : view === "DOCTOR_HOME"
-          ? t("auth.doctorLogin")
-          : view === "WELCOME"
-            ? t("app.tagline")
-            : view
-              .toLowerCase()
-              .replace(/_/g, " ");
+    const toggleOn = audioGuided && !prevAudioGuided.current;
+    prevAudioGuided.current = audioGuided;
+    if (toggleOn) last.current = "";
 
-    if (!title || title === last.current) return;
-    last.current = title;
+    if (!audioGuided || muted) return;
+    const current = view as View;
+    if (current === "SPLASH" || current === "WELCOME") return;
 
-    const say = () => {
-      if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(title);
-      u.lang = lang || "en";
-      u.rate = 1;
-      window.speechSynthesis.speak(u);
-    };
-    const id = window.setTimeout(say, 150);
+    // When the toggle is switched ON, always read the current page out
+    // immediately (this is the "no voice" case the user reported). Otherwise
+    // ThorGuide already narrates fresh non-first-run pages on view change.
+    const handledByThor = !toggleOn && !FIRST_VIEWS.has(current) && !hasSpoken(current);
+    if (handledByThor) return;
+
+    const text = buildThorNarration(current, language, t("thor.askHelp"));
+    if (!text || text === last.current) return;
+    last.current = text;
+
+    const id = window.setTimeout(() => {
+      setBubble(text);
+      speakThor(text, language);
+    }, 150);
     return () => window.clearTimeout(id);
-  }, [view, audioGuided, t, lang]);
+  }, [view, audioGuided, muted, language, t, hasSpoken, setBubble]);
 
   return null;
 }
